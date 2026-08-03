@@ -507,7 +507,9 @@ function setSort(key){
 
 function renderScatter(){
   const rows = currentRows();
-  const W=880, H=440, m={l:58,r:24,t:20,b:52};
+  // Top/side margins must clear the largest bubble (r up to 26) PLUS its label,
+  // which sits above the bubble — otherwise top-row markets (demand ≈ 10) clip.
+  const W=880, H=460, m={l:58,r:40,t:48,b:52};
   const iw=W-m.l-m.r, ih=H-m.t-m.b;
   const x=v=> m.l + ((v-1)/9)*iw;      // size/growth
   const y=v=> m.t + ih - ((v-1)/9)*ih; // demand gap
