@@ -1,0 +1,67 @@
+{
+  "generatedAt": "2026-08-03T13:51:07.301Z",
+  "source": "Hacker News (Algolia) + Wikipedia pageviews",
+  "method": "Blended demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo), log-normalised to 1-10.",
+  "markets": [
+    {
+      "name": "Small contractor job management",
+      "demandScore": 9.7,
+      "hnScore": 9.8,
+      "wikiScore": 9.6
+    },
+    {
+      "name": "Independent landlord / property mgmt",
+      "demandScore": 9.4,
+      "hnScore": 9.2,
+      "wikiScore": 9.5
+    },
+    {
+      "name": "Subcontractor scheduling & dispatch",
+      "demandScore": 7,
+      "hnScore": 5.6,
+      "wikiScore": 8.4
+    },
+    {
+      "name": "Building inspection & surveying",
+      "demandScore": 8,
+      "hnScore": 7.4,
+      "wikiScore": 8.6
+    },
+    {
+      "name": "Trades CRM & quoting",
+      "demandScore": 9.5,
+      "hnScore": 10,
+      "wikiScore": 9
+    },
+    {
+      "name": "Independent gym / studio ops",
+      "demandScore": 6.1,
+      "hnScore": 2.3,
+      "wikiScore": 9.9
+    },
+    {
+      "name": "Auto repair shop management",
+      "demandScore": 5,
+      "hnScore": 1,
+      "wikiScore": 9.1
+    },
+    {
+      "name": "Salon / barber booking & CRM",
+      "demandScore": 6.4,
+      "hnScore": 2.9,
+      "wikiScore": 9.9
+    },
+    {
+      "name": "Independent restaurant back-office",
+      "demandScore": 8.1,
+      "hnScore": 6.2,
+      "wikiScore": 10
+    },
+    {
+      "name": "Small professional services (acct/law)",
+      "demandScore": 8.7,
+      "hnScore": 7.6,
+      "wikiScore": 9.7
+    }
+  ]
+}

@@ -10,6 +10,21 @@ Score any vertical on three signals and let the tool rank the opportunities:
 
 The **Opportunity** score is a weighted average of the three (weights are adjustable in the app). Higher = more underserved.
 
+## Live demand data (free, auto-refreshing)
+
+The **Demand / supply gap** score for the seeded markets is pulled from live, free, keyless sources and refreshed automatically — no paid APIs:
+
+- **Hacker News** (Algolia search API) — tech / pain-point discussion volume (B2B skew)
+- **Wikipedia pageviews** (Wikimedia REST API) — general public interest, which corrects HN's blind spot for local/SMB verticals
+
+`scripts/fetch-signals.mjs` blends the two (50/50, log-normalised to 1–10) and writes `data.json`. A daily GitHub Actions workflow (`.github/workflows/refresh-data.yml`) re-runs it and commits the result, so the hosted dashboard stays current. **Incumbent weakness** and **market size** remain manual scores (no reliable free source for review sentiment). Markets showing a green dot next to their demand score are using live data.
+
+To run the fetch locally:
+
+```bash
+node scripts/fetch-signals.mjs > data.json
+```
+
 ## Features
 
 - Add / edit / remove markets, each rated 1–10 on the three signals
