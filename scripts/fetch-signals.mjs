@@ -1,32 +1,42 @@
 // Pull FREE, live signals for each market and turn them into 1-10 scores.
-// Three keyless, open sources — no paid APIs, no keys to store:
+// Keyless, open sources only — no paid APIs, no keys to store.
 //
-//   DEMAND
+// Usage:  node scripts/fetch-signals.mjs [us|uk]   (default: us)
+//
+//   DEMAND (both regions — interest, not geography)
 //     1. Hacker News (Algolia) search  -> tech / pain-point interest (B2B skew)
 //        https://hn.algolia.com/api
 //     2. Wikipedia pageviews (Wikimedia REST) -> general public interest
 //        https://wikimedia.org/api/rest_v1/  (corrects HN's SMB blind spot)
 //   MARKET SIZE & GROWTH
-//     3. BLS QCEW open data -> national establishment counts by industry
-//        (NAICS) = customer-base / TAM proxy, PLUS the over-the-year change in
-//        establishments = growth. Fully keyless.
-//        https://data.bls.gov/cew/data/api/
+//     US: BLS QCEW open data -> national establishment counts by NAICS + the
+//         over-the-year change in establishments = growth.
+//         https://data.bls.gov/cew/data/api/
+//     UK: ONS "UK Business Counts" via the Nomis open API -> local-unit counts
+//         by SIC-2007 industry + year-over-year change = growth. Keyless.
+//         https://www.nomisweb.co.uk/api/
 //
-// Output: JSON on stdout (the dashboard reads this as data.json). We emit BOTH
-// the blended demand score AND the raw hn/wiki sub-scores, so the dashboard can
-// let the user re-mix HN vs Wikipedia live. Diagnostics go to stderr.
+// Output: JSON on stdout (the dashboard reads this as data.json for US and
+// data-uk.json for UK). We emit BOTH the blended demand score AND the raw
+// hn/wiki sub-scores, so the dashboard can re-mix HN vs Wikipedia live.
+// Diagnostics go to stderr.
 
+const REGION = (process.argv[2] || "us").toLowerCase();
+if (!["us", "uk"].includes(REGION)) { console.error(`Unknown region "${REGION}" (use us|uk)`); process.exit(1); }
+
+// Each market carries demand terms plus the size codes for BOTH regions:
+//   naics  -> BLS QCEW (US)      nomis -> ONS/Nomis industry ids (UK, NM_141_1)
 const MARKETS = [
-  { name: "Small contractor job management",        hn: ["construction management software", "contractor software"],        wiki: ["General contractor", "Construction management"],   naics: ["236", "238"] },
-  { name: "Independent landlord / property mgmt",   hn: ["property management software", "landlord software"],              wiki: ["Property management", "Landlord"],                  naics: ["5313"] },
-  { name: "Subcontractor scheduling & dispatch",    hn: ["field service dispatch software", "job scheduling software"],     wiki: ["Subcontractor", "Field service management"],        naics: ["238"] },
-  { name: "Building inspection & surveying",        hn: ["building inspection software", "site survey software"],           wiki: ["Home inspection", "Building inspection"],           naics: ["541350"] },
-  { name: "Trades CRM & quoting",                   hn: ["field service CRM", "trades quoting software"],                   wiki: ["Field service management", "Tradesperson"],         naics: ["238"] },
-  { name: "Independent gym / studio ops",           hn: ["gym management software", "fitness studio software"],             wiki: ["Health club", "Physical fitness"],                  naics: ["713940"] },
-  { name: "Auto repair shop management",            hn: ["auto repair shop software", "automotive shop management software"], wiki: ["Automobile repair shop", "Maintenance (technical)"], naics: ["8111"] },
-  { name: "Salon / barber booking & CRM",           hn: ["salon booking software", "barber booking app"],                   wiki: ["Beauty salon", "Barber"],                           naics: ["812111", "812112"] },
-  { name: "Independent restaurant back-office",     hn: ["restaurant management software", "restaurant inventory software"], wiki: ["Restaurant", "Restaurant management"],              naics: ["7225"] },
-  { name: "Small professional services (acct/law)", hn: ["practice management software", "legal case management software"], wiki: ["Accountant", "Law firm"],                           naics: ["5411", "5412"] },
+  { name: "Small contractor job management",        hn: ["construction management software", "contractor software"],        wiki: ["General contractor", "Construction management"],   naics: ["236", "238"],        nomis: ["134258828", "134258929", "134258930"] }, // 41100/41201/41202 building construction
+  { name: "Independent landlord / property mgmt",   hn: ["property management software", "landlord software"],              wiki: ["Property management", "Landlord"],                  naics: ["5313"],              nomis: ["134286048", "134285937"] },              // 68320 mgmt + 68209 letting
+  { name: "Subcontractor scheduling & dispatch",    hn: ["field service dispatch software", "job scheduling software"],     wiki: ["Subcontractor", "Field service management"],        naics: ["238"],               nomis: ["146800683"] },                            // 43 specialised construction
+  { name: "Building inspection & surveying",        hn: ["building inspection software", "site survey software"],           wiki: ["Home inspection", "Building inspection"],           naics: ["541350"],            nomis: ["134288850", "134292629"] },              // 71122 eng consulting + 74901 environmental
+  { name: "Trades CRM & quoting",                   hn: ["field service CRM", "trades quoting software"],                   wiki: ["Field service management", "Tradesperson"],         naics: ["238"],               nomis: ["146800683"] },                            // 43 specialised construction
+  { name: "Independent gym / studio ops",           hn: ["gym management software", "fitness studio software"],             wiki: ["Health club", "Physical fitness"],                  naics: ["713940"],            nomis: ["134310858", "134310838"] },              // 93130 fitness + 93110 sports facilities
+  { name: "Auto repair shop management",            hn: ["auto repair shop software", "automotive shop management software"], wiki: ["Automobile repair shop", "Maintenance (technical)"], naics: ["8111"],             nomis: ["134262928"] },                            // 45200 motor vehicle repair
+  { name: "Salon / barber booking & CRM",           hn: ["salon booking software", "barber booking app"],                   wiki: ["Beauty salon", "Barber"],                           naics: ["812111", "812112"],  nomis: ["134313748"] },                            // 96020 hairdressing & beauty
+  { name: "Independent restaurant back-office",     hn: ["restaurant management software", "restaurant inventory software"], wiki: ["Restaurant", "Restaurant management"],              naics: ["7225"],             nomis: ["134273829", "134273830"] },              // 56101 licensed + 56102 unlicensed restaurants
+  { name: "Small professional services (acct/law)", hn: ["practice management software", "legal case management software"], wiki: ["Accountant", "Law firm"],                           naics: ["5411", "5412"],      nomis: ["134286829", "134286830", "134286929", "134286930"] }, // 69101/69102 legal + 69201/69202 accounting
 ];
 
 const HN_WINDOW_YEARS = 3;
@@ -65,10 +75,7 @@ async function wikiViews(article) {
   return (j.items || []).reduce((s, it) => s + (it.views || 0), 0);
 }
 
-// ---- BLS QCEW open data (establishments + growth by NAICS, national) ----
-// The annual "by industry" CSV lists every area; we want the national private
-// row (area_fips US000, own_code 5): annual_avg_estabs = size, and the
-// over-the-year % change in establishments = growth.
+// ---- US: BLS QCEW open data (establishments + growth by NAICS, national) ----
 async function qcew(year, naics) {
   const url = `https://data.bls.gov/cew/data/api/${year}/a/industry/${encodeURIComponent(naics)}.csv`;
   const res = await fetch(url, { headers: { "User-Agent": UA } });
@@ -85,7 +92,6 @@ async function qcew(year, naics) {
   }
   return { estabs: 0, growthPct: 0 };
 }
-// Resolve the most recent QCEW annual year that has data (lags ~1 year).
 async function resolveQcewYear() {
   for (const y of [2024, 2023, 2022]) {
     try { const r = await qcew(y, "7225"); if (r.estabs > 0) return y; } catch (e) { /* try next */ }
@@ -93,21 +99,59 @@ async function resolveQcewYear() {
   return 2023;
 }
 
+// ---- UK: ONS UK Business Counts via Nomis (NM_141_1, local units, keyless) ----
+// geography 2092957697 = United Kingdom; measures 20100 = count of local units;
+// employment_sizeband / legal_status 0 = totals. `industry` accepts a
+// comma-separated list of Nomis ids; we sum the observations.
+const NM_GEO = "2092957697";
+async function nomisCount(ids, date) {
+  const url = `https://www.nomisweb.co.uk/api/v01/dataset/NM_141_1.data.json?` + new URLSearchParams({
+    geography: NM_GEO, date, industry: ids.join(","), employment_sizeband: "0", legal_status: "0", measures: "20100",
+  });
+  const res = await fetch(url, { headers: { "User-Agent": UA } });
+  if (!res.ok) throw new Error(`Nomis ${res.status} for ${ids.join(",")}`);
+  const j = await res.json();
+  const obs = j.obs || [];
+  const total = obs.reduce((s, o) => s + (o.obs_value?.value || 0), 0);
+  const year = obs[0]?.time?.value ? Number(obs[0].time.value) : null;
+  return { total, year };
+}
+// Latest establishment count for a market plus YoY growth (latest vs prior year).
+async function nomisSize(ids) {
+  const latest = await nomisCount(ids, "latest");
+  if (!latest.year || latest.total <= 0) return { estabs: 0, growthPct: 0 };
+  await sleep(150);
+  const prev = await nomisCount(ids, String(latest.year - 1));
+  const growthPct = prev.total > 0 ? Math.round(((latest.total / prev.total) - 1) * 1000) / 10 : 0;
+  return { estabs: latest.total, growthPct };
+}
+
 async function main() {
-  const qcewYear = await resolveQcewYear();
-  console.error(`QCEW year: ${qcewYear}\n`);
+  // Resolve the size source up front so we can label the output.
+  let qcewYear = null;
+  if (REGION === "us") { qcewYear = await resolveQcewYear(); console.error(`QCEW year: ${qcewYear}\n`); }
+  else { console.error(`UK size: ONS UK Business Counts via Nomis (NM_141_1, local units)\n`); }
 
   const rows = [];
   for (const m of MARKETS) {
-    let hnRaw = 0, wikiRaw = 0, estab = 0, growthWeighted = 0;
+    let hnRaw = 0, wikiRaw = 0, estab = 0, growthPct = null;
     for (const t of m.hn)   { try { hnRaw   += await hnSearch(t); }  catch (e) { console.error("  ! " + e.message); } await sleep(150); }
     for (const a of m.wiki) { try { wikiRaw += await wikiViews(a); } catch (e) { console.error("  ! " + e.message); } await sleep(150); }
-    for (const c of m.naics) {
-      try { const q = await qcew(qcewYear, c); estab += q.estabs; growthWeighted += q.estabs * q.growthPct; }
+
+    if (REGION === "us") {
+      let growthWeighted = 0;
+      for (const c of m.naics) {
+        try { const q = await qcew(qcewYear, c); estab += q.estabs; growthWeighted += q.estabs * q.growthPct; }
+        catch (e) { console.error("  ! " + e.message); }
+        await sleep(150);
+      }
+      growthPct = estab > 0 ? Math.round((growthWeighted / estab) * 10) / 10 : null;
+    } else {
+      try { const s = await nomisSize(m.nomis); estab = s.estabs; growthPct = estab > 0 ? s.growthPct : null; }
       catch (e) { console.error("  ! " + e.message); }
       await sleep(150);
     }
-    const growthPct = estab > 0 ? Math.round((growthWeighted / estab) * 10) / 10 : null;
+
     rows.push({ name: m.name, hnRaw, wikiRaw, estab, growthPct });
     console.error(`  ${m.name.padEnd(46)} hn=${String(Math.round(hnRaw)).padStart(5)}  wiki=${String(wikiRaw).padStart(8)}  estab=${String(estab).padStart(8)}  growth=${growthPct ?? "—"}%`);
   }
@@ -135,15 +179,24 @@ async function main() {
   }
 
   const ranked = [...rows].sort((a, b) => b.demandScore - a.demandScore);
-  console.error(`\n=== Scores (demand: HN ${HN_WINDOW_YEARS}y + Wiki ${WIKI_WINDOW_MONTHS}mo | size+growth: QCEW ${qcewYear}) ===`);
+  const sizeLabel = REGION === "us" ? `QCEW ${qcewYear}` : "ONS/Nomis UK Business Counts";
+  console.error(`\n=== ${REGION.toUpperCase()} scores (demand: HN ${HN_WINDOW_YEARS}y + Wiki ${WIKI_WINDOW_MONTHS}mo | size+growth: ${sizeLabel}) ===`);
   for (const r of ranked) {
-    console.error(`  demand ${String(r.demandScore).padStart(4)} (hn ${String(r.hnScore).padStart(4)}/wiki ${String(r.wikiScore).padStart(4)})  size ${String(r.sizeScore ?? "—").padStart(4)} (${(r.estab || 0).toLocaleString()} estabs, ${r.growthPct ?? "—"}%)  ${r.name}`);
+    console.error(`  demand ${String(r.demandScore).padStart(4)} (hn ${String(r.hnScore).padStart(4)}/wiki ${String(r.wikiScore).padStart(4)})  size ${String(r.sizeScore ?? "—").padStart(4)} (${(r.estab || 0).toLocaleString()} ${REGION === "us" ? "estabs" : "local units"}, ${r.growthPct ?? "—"}%)  ${r.name}`);
   }
+
+  const source = REGION === "us"
+    ? "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)"
+    : "Hacker News + Wikipedia (demand) · ONS UK Business Counts / Nomis (market size & growth)";
+  const method = REGION === "us"
+    ? `Demand = ${HN_WEIGHT * 100}% HN discussion (${HN_WINDOW_YEARS}y) + ${WIKI_WEIGHT * 100}% Wikipedia pageviews (${WIKI_WINDOW_MONTHS}mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW ${qcewYear}. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.`
+    : `Demand = ${HN_WEIGHT * 100}% HN discussion (${HN_WINDOW_YEARS}y) + ${WIKI_WEIGHT * 100}% Wikipedia pageviews (${WIKI_WINDOW_MONTHS}mo). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007). All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.`;
 
   process.stdout.write(JSON.stringify({
     generatedAt: new Date().toISOString(),
-    source: "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)",
-    method: `Demand = ${HN_WEIGHT * 100}% HN discussion (${HN_WINDOW_YEARS}y) + ${WIKI_WEIGHT * 100}% Wikipedia pageviews (${WIKI_WINDOW_MONTHS}mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW ${qcewYear}. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.`,
+    region: REGION,
+    source,
+    method,
     markets: rows.map(({ name, demandScore, hnScore, wikiScore, sizeScore, estab, growthPct }) => ({ name, demandScore, hnScore, wikiScore, sizeScore, establishments: estab || null, growthPct })),
   }, null, 2) + "\n");
 }

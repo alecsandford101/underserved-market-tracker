@@ -23,14 +23,17 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Fetch live signals -> data.json
-        run: node scripts/fetch-signals.mjs > data.json
+      - name: Fetch US live signals -> data.json
+        run: node scripts/fetch-signals.mjs us > data.json
+
+      - name: Fetch UK live signals -> data-uk.json
+        run: node scripts/fetch-signals.mjs uk > data-uk.json
 
       - name: Commit if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.json
+          git add data.json data-uk.json
           if git diff --cached --quiet; then
             echo "No data changes — nothing to commit."
           else

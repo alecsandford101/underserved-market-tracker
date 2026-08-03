@@ -131,6 +131,11 @@
   .live-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#22a06b; box-shadow:0 0 0 3px rgba(34,160,107,.18); vertical-align:middle; }
   .mix-ends { display:flex; justify-content:space-between; font-size:11px; color:var(--ink-faint); font-family: ui-monospace, Menlo, monospace; margin-top:3px; }
   .mix-note { font-size:11px; color:var(--ink-faint); margin-top:8px; line-height:1.5; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--card); }
+  .seg button { border:0; background:transparent; padding:8px 14px; font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer; display:flex; align-items:center; gap:6px; }
+  .seg button + button { border-left:1px solid var(--line); }
+  .seg button.on { background:var(--teal); color:#fff; }
+  .seg button:not(.on):hover { background:var(--teal-soft); color:var(--teal); }
 </style>
 </head>
 <body>
@@ -142,6 +147,10 @@
       <p>Score verticals on unmet demand, incumbent weakness, and market size to surface where new technology has the most room to win.</p>
     </div>
     <div class="toolbar">
+      <div class="seg" id="regionSeg" title="Market size & growth region">
+        <button id="region-us" onclick="onRegion('us')">🇺🇸 US</button>
+        <button id="region-uk" onclick="onRegion('uk')">🇬🇧 UK</button>
+      </div>
       <button class="primary" onclick="openModal()">+ Add market</button>
       <button class="ghost" onclick="exportData()">Export</button>
       <button class="ghost" onclick="document.getElementById('importFile').click()">Import</button>
@@ -264,6 +273,7 @@
 const LS_KEY = "underserved_market_tracker_v1";
 const LS_W = "underserved_market_weights_v1";
 const LS_MIX = "underserved_market_demandmix_v1";
+const LS_REGION = "underserved_market_region_v1";
 
 const SEED = [
   // Construction & Real Estate
@@ -285,13 +295,16 @@ let weights = loadWeights();
 let sortKey = "opportunity", sortDir = -1;
 let liveMeta = null;
 let demandMix = loadMix(); // 0..1 = share given to Hacker News (rest to Wikipedia)
+let region = loadRegion(); // 'us' | 'uk' — which market-size dataset to overlay
+const REGION_LABEL = { us: "United States", uk: "United Kingdom" };
+const REGION_FILE = { us: "data.json", uk: "data-uk.json" };
 
 // Fetch the auto-refreshed data.json (same origin) and overwrite the demand
 // score of any market whose name matches. Weakness & size stay manual. We do
 // NOT persist the override to localStorage, so it stays fresh on every load.
 async function applyLiveData(){
   try {
-    const res = await fetch('data.json?ts=' + Date.now(), { cache: 'no-store' });
+    const res = await fetch((REGION_FILE[region] || 'data.json') + '?ts=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) return;
     const live = await res.json();
     if (!live || !Array.isArray(live.markets)) return;
@@ -325,6 +338,18 @@ function onMix(){
   saveMix();
   applyDemandMix();
   render();
+}
+
+function loadRegion(){ try{ const r=localStorage.getItem(LS_REGION); if(r==='us'||r==='uk') return r; }catch(e){} return 'us'; }
+function saveRegion(){ try{ localStorage.setItem(LS_REGION, region); }catch(e){} }
+function syncRegionUI(){
+  document.getElementById('region-us').classList.toggle('on', region==='us');
+  document.getElementById('region-uk').classList.toggle('on', region==='uk');
+}
+function onRegion(r){
+  if (r===region) return;
+  region = r; saveRegion(); syncRegionUI();
+  applyLiveData(); // re-fetch the region's size dataset, then re-render + banner
 }
 
 function id(){ return Math.random().toString(36).slice(2,9); }
@@ -388,7 +413,7 @@ function renderLiveBanner(){
   const d = new Date(liveMeta.generatedAt);
   const when = isNaN(d) ? '' : ' · updated ' + d.toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'});
   el.style.display = 'flex';
-  el.innerHTML = `<span class="live-dot"></span> <b>Live data</b> — ${esc(liveMeta.source)}${when}. <span class="lb-note">Demand and market size refresh automatically; incumbent weakness stays manual (no reliable free source).</span>`;
+  el.innerHTML = `<span class="live-dot"></span> <b>Live data · ${esc(REGION_LABEL[region] || '')}</b> — ${esc(liveMeta.source)}${when}. <span class="lb-note">Demand and market size refresh automatically; incumbent weakness stays manual (no reliable free source). Toggle US/UK to switch the market-size source.</span>`;
 }
 
 function renderFilter(){
@@ -550,6 +575,7 @@ document.getElementById('wW-val').textContent=weights.W.toFixed(1);
 document.getElementById('wS-val').textContent=weights.S.toFixed(1);
 document.getElementById('mix').value = Math.round(demandMix*100);
 document.getElementById('mix-val').textContent = Math.round(demandMix*100)+' / '+Math.round((1-demandMix)*100);
+syncRegionUI();
 document.getElementById('modalBg').addEventListener('click', e=>{ if(e.target.id==='modalBg') closeModal(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 render();
