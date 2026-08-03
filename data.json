@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-08-03T13:51:07.301Z",
+  "generatedAt": "2026-08-03T15:46:22.697Z",
   "source": "Hacker News (Algolia) + Wikipedia pageviews",
   "method": "Blended demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo), log-normalised to 1-10.",
   "markets": [
     {
       "name": "Small contractor job management",
-      "demandScore": 9.7,
-      "hnScore": 9.8,
+      "demandScore": 9.8,
+      "hnScore": 10,
       "wikiScore": 9.6
     },
     {
@@ -17,9 +17,9 @@
     },
     {
       "name": "Subcontractor scheduling & dispatch",
-      "demandScore": 7,
-      "hnScore": 5.6,
-      "wikiScore": 8.4
+      "demandScore": 6.8,
+      "hnScore": 5.5,
+      "wikiScore": 8.1
     },
     {
       "name": "Building inspection & surveying",
@@ -29,9 +29,9 @@
     },
     {
       "name": "Trades CRM & quoting",
-      "demandScore": 9.5,
+      "demandScore": 9.4,
       "hnScore": 10,
-      "wikiScore": 9
+      "wikiScore": 8.9
     },
     {
       "name": "Independent gym / studio ops",
@@ -41,9 +41,9 @@
     },
     {
       "name": "Auto repair shop management",
-      "demandScore": 5,
+      "demandScore": 4.2,
       "hnScore": 1,
-      "wikiScore": 9.1
+      "wikiScore": 7.5
     },
     {
       "name": "Salon / barber booking & CRM",
@@ -59,9 +59,9 @@
     },
     {
       "name": "Small professional services (acct/law)",
-      "demandScore": 8.7,
+      "demandScore": 8.4,
       "hnScore": 7.6,
-      "wikiScore": 9.7
+      "wikiScore": 9.2
     }
   ]
 }
