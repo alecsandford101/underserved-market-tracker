@@ -193,7 +193,7 @@
         </div>
         <div class="ctrl-group" id="ukDemandNote" style="display:none">
           <label>Demand signal</label>
-          <div class="mix-note">UK demand = <b>UK online news interest</b> (Google News, gl=GB) — a media-coverage proxy, not search volume. There's no HN/Wikipedia mix here because the UK signal is a single source.</div>
+          <div class="mix-note" id="ukDemandNoteText">UK demand = <b>UK online news interest</b> (Google News, gl=GB) — a media-coverage proxy, not search volume. There's no HN/Wikipedia mix here because the UK signal is a single source.</div>
         </div>
         <div class="ctrl-group">
           <label>Filter</label>
@@ -325,7 +325,7 @@ async function applyLiveData(){
       if (typeof l.growthPct === 'number') m.growthPct = l.growthPct;
       if (typeof l.establishments === 'number') m.establishments = l.establishments;
     });
-    if (applied) { liveMeta = { source: live.source, generatedAt: live.generatedAt, method: live.method }; applyDemandMix(); render(); }
+    if (applied) { liveMeta = { source: live.source, generatedAt: live.generatedAt, method: live.method, demandBasis: live.demandBasis || (region==='uk'?'news':'blend') }; applyDemandMix(); render(); }
   } catch (e) { /* offline, file://, or no data.json yet — keep manual scores */ }
 }
 
@@ -425,10 +425,19 @@ function renderLiveBanner(){
   const d = new Date(liveMeta.generatedAt);
   const when = isNaN(d) ? '' : ' · updated ' + d.toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'});
   el.style.display = 'flex';
-  const demandCaveat = region==='uk'
+  const demandCaveat = (region==='uk' && liveMeta.demandBasis==='news')
     ? ' UK demand = online news interest (media-coverage proxy), not search volume.'
-    : '';
+    : (region==='uk')
+      ? ' UK demand fell back to the global HN+Wikipedia blend this run (the Google News feed rate-limited the data host).'
+      : '';
   el.innerHTML = `<span class="live-dot"></span> <b>Live data · ${esc(REGION_LABEL[region] || '')}</b> — ${esc(liveMeta.source)}${when}. <span class="lb-note">Demand and market size refresh automatically; incumbent weakness stays manual (no reliable free source). Toggle US/UK to switch region.${demandCaveat}</span>`;
+  // Keep the sidebar UK-demand note in sync with what actually landed this run.
+  if (region==='uk'){
+    const note = document.getElementById('ukDemandNoteText');
+    if (note) note.innerHTML = liveMeta.demandBasis==='news'
+      ? `UK demand = <b>UK online news interest</b> (Google News, gl=GB) — a media-coverage proxy, not search volume. There's no HN/Wikipedia mix here because the UK signal is a single source.`
+      : `UK demand <b>fell back to the global HN+Wikipedia blend</b> this run — the Google News (GB) feed rate-limited the data host. The mix is therefore fixed at 50/50.`;
+  }
 }
 
 function renderFilter(){
@@ -481,7 +490,7 @@ function renderTable(){
         <td class="rank">${i+1}</td>
         <td class="name">${esc(r.name)}${r.notes?`<span class="sub">${esc(r.notes.slice(0,70))}${r.notes.length>70?'…':''}</span>`:''}</td>
         <td><span class="tag">${esc(r.vertical)}</span></td>
-        <td class="num mini">${r.demand}${r.demandLive?` <span class="live-dot" title="${region==='uk'?'Live: UK online news interest (Google News, GB) — media-coverage proxy':'Live: blended Hacker News + Wikipedia signal'}"></span>`:''}</td>
+        <td class="num mini">${r.demand}${r.demandLive?` <span class="live-dot" title="${(region==='uk'&&typeof r.newsScore==='number')?'Live: UK online news interest (Google News, GB) — media-coverage proxy':(region==='uk'?'Live: Hacker News + Wikipedia blend (UK news unavailable this run)':'Live: blended Hacker News + Wikipedia signal')}"></span>`:''}</td>
         <td class="num mini">${r.weakness}</td>
         <td class="num mini">${r.size}${r.sizeLive?` <span class="live-dot" title="Live (${region==='uk'?'ONS/Nomis UK Business Counts':'BLS QCEW'}): ${r.establishments?Number(r.establishments).toLocaleString()+(region==='uk'?' local units':' establishments'):(region==='uk'?'local units':'establishments')}${typeof r.growthPct==='number'?', '+(r.growthPct>=0?'+':'')+r.growthPct+'%/yr':''}"></span>`:''}</td>
         <td class="num"><span class="score-pill" style="background:${heat(r.opportunity)}">${r.opportunity.toFixed(1)}</span></td>

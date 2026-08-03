@@ -89,17 +89,20 @@ async function newsGB(query) {
   const url = "https://news.google.com/rss/search?" + new URLSearchParams({
     q: query, gl: "GB", hl: "en-GB", ceid: "GB:en",
   });
-  for (let attempt = 0; attempt < 2; attempt++) {
+  let lastStatus = "?";
+  for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const res = await fetch(url, { headers: { "User-Agent": BROWSER_UA } });
+      const res = await fetch(url, { headers: { "User-Agent": BROWSER_UA, "Accept": "application/rss+xml, application/xml, text/xml" } });
+      lastStatus = String(res.status);
       if (res.ok) {
         const xml = await res.text();
         const n = (xml.match(/<item>/g) || []).length;
         return Math.min(100, n);
       }
-    } catch (e) { /* transient — retry once */ }
-    await sleep(1500);
+    } catch (e) { lastStatus = "ERR:" + e.message; }
+    await sleep(1500 * (attempt + 1)); // 1.5s, 3s backoff for datacenter-IP rate limits
   }
+  console.error(`    (news blocked for "${query}": last status ${lastStatus})`);
   return null;
 }
 
@@ -227,18 +230,29 @@ async function main() {
     console.error(`  demand ${String(r.demandScore).padStart(4)} (hn ${String(r.hnScore).padStart(4)}/wiki ${String(r.wikiScore).padStart(4)})  size ${String(r.sizeScore ?? "—").padStart(4)} (${(r.estab || 0).toLocaleString()} ${REGION === "us" ? "estabs" : "local units"}, ${r.growthPct ?? "—"}%)  ${r.name}`);
   }
 
+  // Be honest about which UK demand signal actually landed: Google News rate-
+  // limits some datacenter IPs (incl. GitHub Actions), in which case every
+  // vertical falls back to the global HN+Wikipedia blend. Label accordingly so
+  // the dashboard never claims a news signal it didn't get.
+  const newsLive = REGION === "uk" ? rows.filter((r) => r.newsScore != null).length : 0;
+  const ukDemandOK = newsLive > 0;
+  if (REGION === "uk") console.error(`\nUK news signal live for ${newsLive}/${rows.length} verticals${ukDemandOK ? "" : " — falling back to HN+Wikipedia blend"}.`);
+
   const source = REGION === "us"
     ? "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)"
-    : "Google News UK (demand) · ONS UK Business Counts / Nomis (market size & growth)";
+    : `${ukDemandOK ? "Google News UK (demand)" : "Hacker News + Wikipedia (demand — UK news unavailable)"} · ONS UK Business Counts / Nomis (market size & growth)`;
   const method = REGION === "us"
     ? `Demand = ${HN_WEIGHT * 100}% HN discussion (${HN_WINDOW_YEARS}y) + ${WIKI_WEIGHT * 100}% Wikipedia pageviews (${WIKI_WINDOW_MONTHS}mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW ${qcewYear}. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.`
-    : `Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.`;
+    : ukDemandOK
+      ? `Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.`
+      : `Demand = global Hacker News + Wikipedia blend (the UK Google News signal was unavailable this run — its host rate-limits datacenter IPs). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.`;
 
   process.stdout.write(JSON.stringify({
     generatedAt: new Date().toISOString(),
     region: REGION,
     source,
     method,
+    demandBasis: REGION === "us" ? "blend" : (ukDemandOK ? "news" : "blend"),
     markets: rows.map(({ name, demandScore, hnScore, wikiScore, newsScore, sizeScore, estab, growthPct }) => {
       const m = { name, demandScore, hnScore, wikiScore, sizeScore, establishments: estab || null, growthPct };
       if (REGION === "uk") m.newsScore = newsScore ?? null;
