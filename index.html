@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Underserved Market Tracker</title>
+<style>
+  :root {
+    --ink: #14110f;
+    --ink-soft: #57514c;
+    --ink-faint: #8a827b;
+    --paper: #f7f3ee;
+    --card: #fffdfa;
+    --line: #e7ded3;
+    --line-strong: #d8ccbb;
+    --accent: #d1571f;      /* opportunity heat */
+    --accent-soft: #f3d9c9;
+    --teal: #1f7a72;
+    --teal-soft: #d4e9e6;
+    --good: #2e7d4f;
+    --warn: #b5852a;
+    --bad: #b0402f;
+    --shadow: 0 1px 2px rgba(20,17,15,.04), 0 8px 24px rgba(20,17,15,.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Linotype", ui-serif, Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.45;
+  }
+  .wrap { max-width: 1220px; margin: 0 auto; padding: 32px 28px 80px; }
+
+  header.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: 18px; margin-bottom: 26px; }
+  .brand h1 { font-size: 30px; margin: 0 0 4px; letter-spacing: -.01em; }
+  .brand p { margin: 0; color: var(--ink-soft); font-size: 15px; max-width: 560px; }
+  .brand .eyebrow { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+  button, .btn {
+    font: inherit; font-size: 13px; cursor: pointer; border: 1px solid var(--line-strong);
+    background: var(--card); color: var(--ink); padding: 8px 14px; border-radius: 8px;
+    transition: .12s ease; display: inline-flex; align-items: center; gap: 6px;
+  }
+  button:hover { border-color: var(--ink); transform: translateY(-1px); }
+  button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  button.primary:hover { background: var(--accent); border-color: var(--accent); }
+  button.ghost { background: transparent; }
+
+  .layout { display: grid; grid-template-columns: 260px 1fr; gap: 26px; align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+  .panel .hd { padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); font-family: ui-monospace, Menlo, monospace; }
+  .panel .bd { padding: 16px; }
+
+  /* Controls sidebar */
+  .ctrl-group { margin-bottom: 22px; }
+  .ctrl-group:last-child { margin-bottom: 0; }
+  .ctrl-group > label { display: block; font-size: 12px; font-family: ui-monospace, Menlo, monospace; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px; }
+  .weight { margin-bottom: 14px; }
+  .weight .row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+  .weight .row b { font-variant-numeric: tabular-nums; color: var(--accent); }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  select, input[type=text], input[type=number], textarea {
+    width: 100%; font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line-strong);
+    border-radius: 8px; background: var(--paper); color: var(--ink);
+  }
+  textarea { resize: vertical; min-height: 60px; }
+
+  /* Summary stats */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  @media (max-width: 700px) { .stats { grid-template-columns: repeat(2,1fr); } }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-faint); font-family: ui-monospace, Menlo, monospace; }
+  .stat .v { font-size: 26px; font-weight: 600; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .stat .v small { font-size: 13px; color: var(--ink-soft); font-weight: 400; }
+
+  /* Scatter */
+  .viz-wrap { display:grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px; }
+  svg { display: block; width: 100%; height: auto; }
+  .axis-label { font-size: 11px; fill: var(--ink-faint); font-family: ui-monospace, Menlo, monospace; }
+  .grid-line { stroke: var(--line); stroke-width: 1; }
+  .bubble { cursor: pointer; transition: .12s; }
+  .bubble:hover { stroke: var(--ink); stroke-width: 2; }
+  .bubble-label { font-size: 10px; fill: var(--ink-soft); pointer-events: none; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--line); }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint); font-family: ui-monospace, Menlo, monospace; cursor: pointer; user-select: none; white-space: nowrap; }
+  th:hover { color: var(--ink); }
+  th .arrow { color: var(--accent); }
+  tbody tr:hover { background: var(--paper); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.name { font-weight: 600; }
+  td .sub { display:block; font-weight: 400; font-size: 12px; color: var(--ink-faint); font-family: ui-monospace, Menlo, monospace; }
+  .tag { display:inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--teal-soft); color: var(--teal); font-family: ui-monospace, Menlo, monospace; }
+  .score-pill { display:inline-flex; align-items:center; justify-content:center; min-width: 42px; padding: 4px 8px; border-radius: 8px; font-weight: 700; font-variant-numeric: tabular-nums; color: #fff; }
+  .mini { font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .rowbtn { padding: 4px 8px; font-size: 12px; }
+  .rank { color: var(--ink-faint); font-variant-numeric: tabular-nums; font-family: ui-monospace, Menlo, monospace; }
+
+  /* Modal */
+  .modal-bg { position: fixed; inset: 0; background: rgba(20,17,15,.4); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+  .modal-bg.open { display: flex; }
+  .modal { background: var(--card); border-radius: 16px; width: 100%; max-width: 540px; box-shadow: 0 20px 60px rgba(0,0,0,.25); max-height: 92vh; overflow: auto; }
+  .modal .hd { padding: 18px 22px; border-bottom: 1px solid var(--line); display:flex; justify-content: space-between; align-items:center; }
+  .modal .hd h2 { margin: 0; font-size: 20px; }
+  .modal .bd { padding: 22px; }
+  .field { margin-bottom: 16px; }
+  .field label { display:block; font-size: 12px; font-family: ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); margin-bottom: 6px; }
+  .field .hint { font-size: 12px; color: var(--ink-faint); margin-top: 4px; font-family: ui-monospace, Menlo, monospace; }
+  .slider-field { margin-bottom: 18px; }
+  .slider-field .top { display:flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .slider-field .top .val { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .slider-field .top label { font-size: 13px; text-transform: none; letter-spacing: 0; color: var(--ink); font-family: inherit; }
+  .modal .ft { padding: 16px 22px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; }
+  .empty { text-align:center; padding: 50px 20px; color: var(--ink-faint); }
+  .footnote { margin-top: 30px; font-size: 12px; color: var(--ink-faint); line-height: 1.7; }
+  .footnote code { background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; color: var(--accent); }
+  .filterbar { display:flex; gap: 10px; align-items:center; margin-bottom: 14px; flex-wrap: wrap; }
+  .filterbar input[type=text] { max-width: 240px; }
+  .filterbar select { max-width: 200px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">Market Opportunity Radar</div>
+      <h1>Underserved Market Tracker</h1>
+      <p>Score verticals on unmet demand, incumbent weakness, and market size to surface where new technology has the most room to win.</p>
+    </div>
+    <div class="toolbar">
+      <button class="primary" onclick="openModal()">+ Add market</button>
+      <button class="ghost" onclick="exportData()">Export</button>
+      <button class="ghost" onclick="document.getElementById('importFile').click()">Import</button>
+      <button class="ghost" onclick="resetSeed()">Reset to sample</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
+    </div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="layout">
+    <aside class="panel">
+      <div class="hd">Scoring weights</div>
+      <div class="bd">
+        <div class="ctrl-group">
+          <label>Signal importance</label>
+          <div class="weight">
+            <div class="row"><span>Demand / supply gap</span><b id="wD-val">1.0</b></div>
+            <input type="range" id="wD" min="0" max="2" step="0.1" value="1" oninput="onWeight()">
+          </div>
+          <div class="weight">
+            <div class="row"><span>Incumbent weakness</span><b id="wW-val">1.0</b></div>
+            <input type="range" id="wW" min="0" max="2" step="0.1" value="1" oninput="onWeight()">
+          </div>
+          <div class="weight">
+            <div class="row"><span>Market size &amp; growth</span><b id="wS-val">1.0</b></div>
+            <input type="range" id="wS" min="0" max="2" step="0.1" value="1" oninput="onWeight()">
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <label>Filter</label>
+          <select id="vfilter" onchange="render()"></select>
+        </div>
+        <div class="ctrl-group">
+          <label>Search</label>
+          <input type="text" id="search" placeholder="Filter by name…" oninput="render()">
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="viz-wrap">
+        <div class="panel">
+          <div class="hd">Opportunity map — bubble size = incumbent weakness</div>
+          <div class="bd"><div id="scatter"></div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="hd">Ranked markets</div>
+        <div class="bd">
+          <div id="tableHost"></div>
+        </div>
+      </div>
+
+      <p class="footnote">
+        <b>How the score works.</b> Each market is rated 1–10 on three signals. The <code>Opportunity</code> score is a weighted average
+        (adjust weights at left) — higher means more unmet room for new technology. <b>Demand/supply gap</b>: strong customer need but few good solutions.
+        <b>Incumbent weakness</b>: legacy players, poor reviews, dated tech, high prices, low NPS. <b>Market size &amp; growth</b>: TAM, growth rate,
+        fragmentation, willingness to pay. Data is stored only in your browser (localStorage). Use Export to back up or share.
+      </p>
+    </main>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="hd"><h2 id="modalTitle">Add market</h2><button class="ghost" onclick="closeModal()">✕</button></div>
+    <div class="bd">
+      <input type="hidden" id="f-id">
+      <div class="field">
+        <label>Market / segment name</label>
+        <input type="text" id="f-name" placeholder="e.g. Small contractor job management">
+      </div>
+      <div class="field">
+        <label>Vertical</label>
+        <input type="text" id="f-vertical" list="vertlist" placeholder="e.g. Construction & Real Estate">
+        <datalist id="vertlist"></datalist>
+      </div>
+      <div class="slider-field">
+        <div class="top"><label>Demand / supply gap</label><span class="val" id="f-demand-val">5</span></div>
+        <input type="range" id="f-demand" min="1" max="10" step="1" value="5" oninput="document.getElementById('f-demand-val').textContent=this.value">
+      </div>
+      <div class="slider-field">
+        <div class="top"><label>Incumbent weakness</label><span class="val" id="f-weakness-val">5</span></div>
+        <input type="range" id="f-weakness" min="1" max="10" step="1" value="5" oninput="document.getElementById('f-weakness-val').textContent=this.value">
+      </div>
+      <div class="slider-field">
+        <div class="top"><label>Market size &amp; growth</label><span class="val" id="f-size-val">5</span></div>
+        <input type="range" id="f-size" min="1" max="10" step="1" value="5" oninput="document.getElementById('f-size-val').textContent=this.value">
+      </div>
+      <div class="field">
+        <label>Notes (incumbents, evidence, ideas)</label>
+        <textarea id="f-notes" placeholder="e.g. Dominated by Procore (enterprise) and spreadsheets. SMBs priced out. Mobile-first gap."></textarea>
+      </div>
+    </div>
+    <div class="ft">
+      <button class="ghost bad" id="deleteBtn" onclick="deleteCurrent()" style="color:var(--bad)">Delete</button>
+      <div style="display:flex;gap:10px;">
+        <button class="ghost" onclick="closeModal()">Cancel</button>
+        <button class="primary" onclick="saveMarket()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const LS_KEY = "underserved_market_tracker_v1";
+const LS_W = "underserved_market_weights_v1";
+
+const SEED = [
+  // Construction & Real Estate
+  { id:id(), name:"Small contractor job management", vertical:"Construction & Real Estate", demand:9, weakness:7, size:8, notes:"Procore/Buildertrend skew enterprise & pricey; most small GCs run on spreadsheets, texts & paper. Mobile-first, cheap, simple is wide open." },
+  { id:id(), name:"Independent landlord / property mgmt", vertical:"Construction & Real Estate", demand:8, weakness:7, size:7, notes:"Small landlords (1–20 units) underserved vs AppFolio/Yardi enterprise tools. Rent, maintenance, screening fragmented." },
+  { id:id(), name:"Subcontractor scheduling & dispatch", vertical:"Construction & Real Estate", demand:7, weakness:8, size:6, notes:"Coordination still by phone/text. Legacy tools clunky. Real-time crew scheduling gap." },
+  { id:id(), name:"Building inspection & surveying", vertical:"Construction & Real Estate", demand:6, weakness:8, size:5, notes:"Paper checklists, PDF reports. Little modern mobile capture / AI defect detection for small firms." },
+  { id:id(), name:"Trades CRM & quoting", vertical:"Construction & Real Estate", demand:8, weakness:6, size:7, notes:"ServiceTitan strong but enterprise-priced; small trades want light CRM + fast quotes + follow-up automation." },
+  // Local Services & SMB
+  { id:id(), name:"Independent gym / studio ops", vertical:"Local Services & SMB", demand:7, weakness:6, size:6, notes:"Mindbody dominant but hated (price, UX). Real churn — opening for cheaper, better booking + payments." },
+  { id:id(), name:"Auto repair shop management", vertical:"Local Services & SMB", demand:8, weakness:8, size:7, notes:"Legacy DOS-era shop software still common. Booking, estimates, parts, customer comms all dated." },
+  { id:id(), name:"Salon / barber booking & CRM", vertical:"Local Services & SMB", demand:6, weakness:5, size:6, notes:"Fresha/Booksy crowded but retention/marketing weak. Niche (barbers, nail) still thin." },
+  { id:id(), name:"Independent restaurant back-office", vertical:"Local Services & SMB", demand:7, weakness:7, size:8, notes:"POS crowded; but inventory, scheduling, margin analytics for single-location owners fragmented & manual." },
+  { id:id(), name:"Small professional services (acct/law)", vertical:"Local Services & SMB", demand:7, weakness:7, size:7, notes:"Solo/small accountants & lawyers on email + Excel. Intake, workflow, client portal + AI drafting underserved." },
+];
+
+let data = load();
+let weights = loadWeights();
+let sortKey = "opportunity", sortDir = -1;
+
+function id(){ return Math.random().toString(36).slice(2,9); }
+function load(){ try{ const r=localStorage.getItem(LS_KEY); if(r) return JSON.parse(r);}catch(e){} return JSON.parse(JSON.stringify(SEED)); }
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+function loadWeights(){ try{ const r=localStorage.getItem(LS_W); if(r) return JSON.parse(r);}catch(e){} return {D:1,W:1,S:1}; }
+function saveWeights(){ localStorage.setItem(LS_W, JSON.stringify(weights)); }
+
+function opportunity(m){
+  const t = weights.D + weights.W + weights.S;
+  if (t === 0) return 0;
+  return (m.demand*weights.D + m.weakness*weights.W + m.size*weights.S) / t;
+}
+function heat(v){ // v 1-10 -> color
+  const t = Math.max(0, Math.min(1, (v-1)/9));
+  const c1 = [31,122,114], c2 = [209,87,31]; // teal -> accent
+  const c = c1.map((a,i)=> Math.round(a + (c2[i]-a)*t));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+
+function onWeight(){
+  weights.D = parseFloat(document.getElementById('wD').value);
+  weights.W = parseFloat(document.getElementById('wW').value);
+  weights.S = parseFloat(document.getElementById('wS').value);
+  document.getElementById('wD-val').textContent = weights.D.toFixed(1);
+  document.getElementById('wW-val').textContent = weights.W.toFixed(1);
+  document.getElementById('wS-val').textContent = weights.S.toFixed(1);
+  saveWeights(); render();
+}
+
+function verticals(){ return [...new Set(data.map(m=>m.vertical))].sort(); }
+
+function currentRows(){
+  const vf = document.getElementById('vfilter').value;
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  let rows = data.map(m => ({...m, opportunity: opportunity(m)}));
+  if (vf && vf !== "__all") rows = rows.filter(r=>r.vertical===vf);
+  if (q) rows = rows.filter(r=> r.name.toLowerCase().includes(q) || (r.notes||"").toLowerCase().includes(q));
+  rows.sort((a,b)=>{
+    let x=a[sortKey], y=b[sortKey];
+    if (typeof x === "string"){ x=x.toLowerCase(); y=y.toLowerCase(); }
+    return x<y? -sortDir : x>y? sortDir : 0;
+  });
+  return rows;
+}
+
+function render(){
+  renderFilter();
+  renderStats();
+  renderScatter();
+  renderTable();
+  renderDatalist();
+}
+
+function renderFilter(){
+  const sel = document.getElementById('vfilter');
+  const cur = sel.value || "__all";
+  sel.innerHTML = `<option value="__all">All verticals</option>` + verticals().map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  sel.value = [...sel.options].some(o=>o.value===cur)? cur : "__all";
+}
+function renderDatalist(){
+  document.getElementById('vertlist').innerHTML = verticals().map(v=>`<option value="${esc(v)}">`).join("");
+}
+
+function renderStats(){
+  const rows = data.map(m=>({...m, opportunity:opportunity(m)}));
+  const n = rows.length;
+  const avg = n? rows.reduce((s,r)=>s+r.opportunity,0)/n : 0;
+  const top = rows.slice().sort((a,b)=>b.opportunity-a.opportunity)[0];
+  const nv = verticals().length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="k">Markets tracked</div><div class="v">${n}</div></div>
+    <div class="stat"><div class="k">Verticals</div><div class="v">${nv}</div></div>
+    <div class="stat"><div class="k">Avg opportunity</div><div class="v">${avg.toFixed(1)}<small>/10</small></div></div>
+    <div class="stat"><div class="k">Top pick</div><div class="v" style="font-size:16px;line-height:1.3">${top? esc(top.name) : "—"}<br><small>${top? top.opportunity.toFixed(1)+" opportunity" : ""}</small></div></div>
+  `;
+}
+
+function renderTable(){
+  const rows = currentRows();
+  const host = document.getElementById('tableHost');
+  if (!rows.length){ host.innerHTML = `<div class="empty">No markets match. Add one or clear filters.</div>`; return; }
+  const th = (key,label,cls="")=>{
+    const arrow = sortKey===key ? `<span class="arrow">${sortDir<0?'▼':'▲'}</span>` : '';
+    return `<th class="${cls}" onclick="setSort('${key}')">${label} ${arrow}</th>`;
+  };
+  host.innerHTML = `
+  <table>
+    <thead><tr>
+      <th style="width:34px">#</th>
+      ${th('name','Market')}
+      ${th('vertical','Vertical')}
+      ${th('demand','Demand gap','num')}
+      ${th('weakness','Weak inc.','num')}
+      ${th('size','Size/growth','num')}
+      ${th('opportunity','Opportunity','num')}
+      <th style="width:70px"></th>
+    </tr></thead>
+    <tbody>
+    ${rows.map((r,i)=>`
+      <tr>
+        <td class="rank">${i+1}</td>
+        <td class="name">${esc(r.name)}${r.notes?`<span class="sub">${esc(r.notes.slice(0,70))}${r.notes.length>70?'…':''}</span>`:''}</td>
+        <td><span class="tag">${esc(r.vertical)}</span></td>
+        <td class="num mini">${r.demand}</td>
+        <td class="num mini">${r.weakness}</td>
+        <td class="num mini">${r.size}</td>
+        <td class="num"><span class="score-pill" style="background:${heat(r.opportunity)}">${r.opportunity.toFixed(1)}</span></td>
+        <td class="num"><button class="rowbtn" onclick="openModal('${r.id}')">Edit</button></td>
+      </tr>`).join("")}
+    </tbody>
+  </table>`;
+}
+
+function setSort(key){
+  if (sortKey===key) sortDir*=-1; else { sortKey=key; sortDir = (key==='name'||key==='vertical')?1:-1; }
+  render();
+}
+
+function renderScatter(){
+  const rows = currentRows();
+  const W=880, H=440, m={l:58,r:24,t:20,b:52};
+  const iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const x=v=> m.l + ((v-1)/9)*iw;      // size/growth
+  const y=v=> m.t + ih - ((v-1)/9)*ih; // demand gap
+  let g="";
+  for(let i=1;i<=10;i++){
+    g+=`<line class="grid-line" x1="${x(i)}" y1="${m.t}" x2="${x(i)}" y2="${m.t+ih}"/>`;
+    g+=`<line class="grid-line" x1="${m.l}" y1="${y(i)}" x2="${m.l+iw}" y2="${y(i)}"/>`;
+  }
+  const bubbles = rows.map(r=>{
+    const rad = 6 + (r.weakness/10)*20;
+    const op = opportunity(r);
+    return `<g class="bubble" onclick="openModal('${r.id}')">
+      <circle cx="${x(r.size)}" cy="${y(r.demand)}" r="${rad}" fill="${heat(op)}" fill-opacity="0.72" stroke="${heat(op)}"/>
+      <text class="bubble-label" x="${x(r.size)}" y="${y(r.demand)-rad-4}" text-anchor="middle">${esc(r.name.length>22?r.name.slice(0,20)+'…':r.name)}</text>
+    </g>`;
+  }).join("");
+  document.getElementById('scatter').innerHTML = `
+  <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Opportunity scatter plot">
+    ${g}
+    <line class="grid-line" style="stroke:var(--line-strong)" x1="${m.l}" y1="${m.t+ih}" x2="${m.l+iw}" y2="${m.t+ih}"/>
+    <line class="grid-line" style="stroke:var(--line-strong)" x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${m.t+ih}"/>
+    <text class="axis-label" x="${m.l+iw/2}" y="${H-14}" text-anchor="middle">Market size &amp; growth →</text>
+    <text class="axis-label" transform="translate(16 ${m.t+ih/2}) rotate(-90)" text-anchor="middle">Demand / supply gap →</text>
+    ${bubbles}
+  </svg>`;
+}
+
+/* ---- Modal ---- */
+function openModal(mid){
+  const isEdit = !!mid;
+  document.getElementById('modalTitle').textContent = isEdit? "Edit market" : "Add market";
+  document.getElementById('deleteBtn').style.display = isEdit? "inline-flex":"none";
+  const m = isEdit? data.find(x=>x.id===mid) : {id:"",name:"",vertical:document.getElementById('vfilter').value !== '__all' ? document.getElementById('vfilter').value : "",demand:5,weakness:5,size:5,notes:""};
+  document.getElementById('f-id').value = m.id;
+  document.getElementById('f-name').value = m.name;
+  document.getElementById('f-vertical').value = m.vertical;
+  setSlider('demand', m.demand); setSlider('weakness', m.weakness); setSlider('size', m.size);
+  document.getElementById('f-notes').value = m.notes||"";
+  document.getElementById('modalBg').classList.add('open');
+  document.getElementById('f-name').focus();
+}
+function setSlider(k,v){ document.getElementById('f-'+k).value=v; document.getElementById('f-'+k+'-val').textContent=v; }
+function closeModal(){ document.getElementById('modalBg').classList.remove('open'); }
+function saveMarket(){
+  const name = document.getElementById('f-name').value.trim();
+  if(!name){ document.getElementById('f-name').focus(); return; }
+  const rec = {
+    id: document.getElementById('f-id').value || id(),
+    name,
+    vertical: document.getElementById('f-vertical').value.trim() || "Uncategorized",
+    demand: +document.getElementById('f-demand').value,
+    weakness: +document.getElementById('f-weakness').value,
+    size: +document.getElementById('f-size').value,
+    notes: document.getElementById('f-notes').value.trim(),
+  };
+  const i = data.findIndex(x=>x.id===rec.id);
+  if(i>=0) data[i]=rec; else data.push(rec);
+  save(); closeModal(); render();
+}
+function deleteCurrent(){
+  const mid = document.getElementById('f-id').value;
+  if(!mid) return;
+  if(!confirm("Delete this market?")) return;
+  data = data.filter(x=>x.id!==mid);
+  save(); closeModal(); render();
+}
+
+/* ---- Data I/O ---- */
+function exportData(){
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download="underserved-markets.json"; a.click(); URL.revokeObjectURL(a.href);
+}
+function importData(e){
+  const f=e.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{ try{ const arr=JSON.parse(rd.result); if(Array.isArray(arr)){ data=arr.map(x=>({id:x.id||id(),name:x.name||"Untitled",vertical:x.vertical||"Uncategorized",demand:+x.demand||5,weakness:+x.weakness||5,size:+x.size||5,notes:x.notes||""})); save(); render(); } else alert("File must be a JSON array."); }catch(err){ alert("Could not parse file."); } };
+  rd.readAsText(f); e.target.value="";
+}
+function resetSeed(){ if(confirm("Replace all data with the sample set?")){ data=JSON.parse(JSON.stringify(SEED)); save(); render(); } }
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// init weight sliders
+document.getElementById('wD').value=weights.D; document.getElementById('wW').value=weights.W; document.getElementById('wS').value=weights.S;
+document.getElementById('wD-val').textContent=weights.D.toFixed(1);
+document.getElementById('wW-val').textContent=weights.W.toFixed(1);
+document.getElementById('wS-val').textContent=weights.S.toFixed(1);
+document.getElementById('modalBg').addEventListener('click', e=>{ if(e.target.id==='modalBg') closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+render();
+</script>
+</body>
+</html>
