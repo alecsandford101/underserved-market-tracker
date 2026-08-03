@@ -1,9 +1,9 @@
 name: Refresh market data
 
-# Runs the free HN + Wikipedia (demand) + BLS QCEW (size & growth) fetch on a
-# schedule and commits data.json back to the repo. GitHub Pages then serves the
-# refreshed scores. Free on public repos; no API keys needed, so nothing secret
-# is exposed.
+# Runs the free, keyless signal fetch for both regions on a schedule and commits
+# the results back to the repo (US: HN+Wikipedia demand + BLS QCEW size; UK:
+# Google News GB demand + ONS/Nomis size). GitHub Pages then serves the refreshed
+# scores. Free on public repos; no API keys needed, so nothing secret is exposed.
 
 on:
   schedule:

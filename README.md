@@ -12,21 +12,19 @@ The **Opportunity** score is a weighted average of the three (weights are adjust
 
 ## Live data (free, auto-refreshing)
 
-Two of the three signals are pulled from live, free, **keyless** sources and refreshed automatically — no paid APIs, no keys to store:
+Two of the three signals are pulled from live, free, **keyless** sources and refreshed automatically — no paid APIs, no keys to store. Both the demand *and* the market-size signals are **region-aware**, switchable with the **US / UK toggle** in the header:
 
-**Demand / supply gap** — blended from:
-- **Hacker News** (Algolia search API) — tech / pain-point discussion volume (B2B skew)
-- **Wikipedia pageviews** (Wikimedia REST API) — general public interest, which corrects HN's blind spot for local/SMB verticals
+**Demand / supply gap**
+- **US** — blended from **Hacker News** (Algolia search API — tech / pain-point discussion, B2B skew) and **Wikipedia pageviews** (Wikimedia REST API — general public interest, which corrects HN's blind spot for local/SMB verticals). The blend defaults to 50/50, and a **demand-mix slider** rebalances HN vs Wikipedia live (the raw sub-scores ship in `data.json`, so re-mixing is client-side).
+- **UK** — **Google News** RSS scoped to Great Britain (`gl=GB`): the count of UK-weighted news items per vertical, log-normalised to 1–10. This is the only keyless source that stays reachable from CI (Google Trends and GDELT rate-limit datacenter IPs), but it's a **media-coverage proxy, not search volume** — the dashboard labels it as such and swaps the mix slider for a note in UK mode.
 
-The blend defaults to 50/50, and the dashboard has a **demand-mix slider** to rebalance HN vs Wikipedia live (the raw sub-scores are shipped in `data.json`, so re-mixing happens client-side).
-
-**Market size & growth** — region-aware, switchable with the **US / UK toggle** in the header:
+**Market size & growth**
 - **US** — **BLS QCEW** open data: national establishment counts by NAICS industry plus the over-the-year change in establishments (growth).
 - **UK** — **ONS "UK Business Counts"** via the **Nomis** open API: local-unit counts by SIC-2007 industry plus year-over-year growth. Also keyless.
 
-Either way it's 80% size + 20% growth, log-normalised to 1–10. The demand signal is region-independent (interest, not geography), so switching region only re-overlays the market-size numbers.
+Market size is 80% size + 20% growth, log-normalised to 1–10. Switching region re-overlays both the demand and the market-size numbers.
 
-`scripts/fetch-signals.mjs` takes a region argument and produces `data.json` (US) and `data-uk.json` (UK); a daily GitHub Actions workflow (`.github/workflows/refresh-data.yml`) re-runs both and commits the results, so the hosted dashboard stays current. **Incumbent weakness** remains a manual score (no reliable free source for review sentiment). Markets showing a green dot next to a score are using live data.
+`scripts/fetch-signals.mjs` takes a region argument (`us`/`uk`) and produces `data.json` (US) and `data-uk.json` (UK); a daily GitHub Actions workflow (`.github/workflows/refresh-data.yml`) re-runs both and commits the results, so the hosted dashboard stays current. **Incumbent weakness** remains a manual score (no reliable free source for review sentiment). Markets showing a green dot next to a score are using live data.
 
 To run the fetch locally:
 

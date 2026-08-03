@@ -182,7 +182,7 @@
             <input type="range" id="wS" min="0" max="2" step="0.1" value="1" oninput="onWeight()">
           </div>
         </div>
-        <div class="ctrl-group">
+        <div class="ctrl-group" id="mixGroup">
           <label>Demand signal mix</label>
           <div class="weight">
             <div class="row"><span>HN / Wikipedia</span><b id="mix-val">50 / 50</b></div>
@@ -190,6 +190,10 @@
             <div class="mix-ends"><span>Wikipedia</span><span>Hacker News</span></div>
           </div>
           <div class="mix-note">Rebalances the two live demand sources: higher HN = tech / pain-point weighting; higher Wikipedia = general-interest weighting.</div>
+        </div>
+        <div class="ctrl-group" id="ukDemandNote" style="display:none">
+          <label>Demand signal</label>
+          <div class="mix-note">UK demand = <b>UK online news interest</b> (Google News, gl=GB) — a media-coverage proxy, not search volume. There's no HN/Wikipedia mix here because the UK signal is a single source.</div>
         </div>
         <div class="ctrl-group">
           <label>Filter</label>
@@ -316,6 +320,7 @@ async function applyLiveData(){
       if (typeof l.demandScore === 'number') { m.demand = l.demandScore; m.demandLive = true; applied++; }
       if (typeof l.hnScore === 'number') m.hnScore = l.hnScore;
       if (typeof l.wikiScore === 'number') m.wikiScore = l.wikiScore;
+      m.newsScore = (typeof l.newsScore === 'number') ? l.newsScore : null;
       if (typeof l.sizeScore === 'number') { m.size = l.sizeScore; m.sizeLive = true; }
       if (typeof l.growthPct === 'number') m.growthPct = l.growthPct;
       if (typeof l.establishments === 'number') m.establishments = l.establishments;
@@ -325,7 +330,10 @@ async function applyLiveData(){
 }
 
 // Recompute demand for live markets from the current HN/Wikipedia mix.
+// US only — UK demand comes from the Google News (GB) signal and must not be
+// re-mixed away, so we leave m.demand at its shipped news-based value.
 function applyDemandMix(){
+  if (region === 'uk') return;
   data.forEach(m => {
     if (m.demandLive && typeof m.hnScore === 'number' && typeof m.wikiScore === 'number') {
       m.demand = Math.round((demandMix * m.hnScore + (1 - demandMix) * m.wikiScore) * 10) / 10;
@@ -345,6 +353,10 @@ function saveRegion(){ try{ localStorage.setItem(LS_REGION, region); }catch(e){}
 function syncRegionUI(){
   document.getElementById('region-us').classList.toggle('on', region==='us');
   document.getElementById('region-uk').classList.toggle('on', region==='uk');
+  // The HN/Wikipedia mix only applies to the US demand signal; UK demand is the
+  // single Google News (GB) source, so swap the slider for an explanatory note.
+  document.getElementById('mixGroup').style.display   = region==='uk' ? 'none' : '';
+  document.getElementById('ukDemandNote').style.display = region==='uk' ? '' : 'none';
 }
 function onRegion(r){
   if (r===region) return;
@@ -413,7 +425,10 @@ function renderLiveBanner(){
   const d = new Date(liveMeta.generatedAt);
   const when = isNaN(d) ? '' : ' · updated ' + d.toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'});
   el.style.display = 'flex';
-  el.innerHTML = `<span class="live-dot"></span> <b>Live data · ${esc(REGION_LABEL[region] || '')}</b> — ${esc(liveMeta.source)}${when}. <span class="lb-note">Demand and market size refresh automatically; incumbent weakness stays manual (no reliable free source). Toggle US/UK to switch the market-size source.</span>`;
+  const demandCaveat = region==='uk'
+    ? ' UK demand = online news interest (media-coverage proxy), not search volume.'
+    : '';
+  el.innerHTML = `<span class="live-dot"></span> <b>Live data · ${esc(REGION_LABEL[region] || '')}</b> — ${esc(liveMeta.source)}${when}. <span class="lb-note">Demand and market size refresh automatically; incumbent weakness stays manual (no reliable free source). Toggle US/UK to switch region.${demandCaveat}</span>`;
 }
 
 function renderFilter(){
@@ -466,9 +481,9 @@ function renderTable(){
         <td class="rank">${i+1}</td>
         <td class="name">${esc(r.name)}${r.notes?`<span class="sub">${esc(r.notes.slice(0,70))}${r.notes.length>70?'…':''}</span>`:''}</td>
         <td><span class="tag">${esc(r.vertical)}</span></td>
-        <td class="num mini">${r.demand}${r.demandLive?' <span class="live-dot" title="Live: blended Hacker News + Wikipedia signal"></span>':''}</td>
+        <td class="num mini">${r.demand}${r.demandLive?` <span class="live-dot" title="${region==='uk'?'Live: UK online news interest (Google News, GB) — media-coverage proxy':'Live: blended Hacker News + Wikipedia signal'}"></span>`:''}</td>
         <td class="num mini">${r.weakness}</td>
-        <td class="num mini">${r.size}${r.sizeLive?` <span class="live-dot" title="Live (BLS QCEW): ${r.establishments?Number(r.establishments).toLocaleString()+' establishments':'establishments'}${typeof r.growthPct==='number'?', '+(r.growthPct>=0?'+':'')+r.growthPct+'%/yr':''}"></span>`:''}</td>
+        <td class="num mini">${r.size}${r.sizeLive?` <span class="live-dot" title="Live (${region==='uk'?'ONS/Nomis UK Business Counts':'BLS QCEW'}): ${r.establishments?Number(r.establishments).toLocaleString()+(region==='uk'?' local units':' establishments'):(region==='uk'?'local units':'establishments')}${typeof r.growthPct==='number'?', '+(r.growthPct>=0?'+':'')+r.growthPct+'%/yr':''}"></span>`:''}</td>
         <td class="num"><span class="score-pill" style="background:${heat(r.opportunity)}">${r.opportunity.toFixed(1)}</span></td>
         <td class="num"><button class="rowbtn" onclick="openModal('${r.id}')">Edit</button></td>
       </tr>`).join("")}
