@@ -129,6 +129,8 @@
   .live-banner b { color: var(--teal); }
   .live-banner .lb-note { color: var(--ink-soft); }
   .live-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#22a06b; box-shadow:0 0 0 3px rgba(34,160,107,.18); vertical-align:middle; }
+  .mix-ends { display:flex; justify-content:space-between; font-size:11px; color:var(--ink-faint); font-family: ui-monospace, Menlo, monospace; margin-top:3px; }
+  .mix-note { font-size:11px; color:var(--ink-faint); margin-top:8px; line-height:1.5; }
 </style>
 </head>
 <body>
@@ -170,6 +172,15 @@
             <div class="row"><span>Market size &amp; growth</span><b id="wS-val">1.0</b></div>
             <input type="range" id="wS" min="0" max="2" step="0.1" value="1" oninput="onWeight()">
           </div>
+        </div>
+        <div class="ctrl-group">
+          <label>Demand signal mix</label>
+          <div class="weight">
+            <div class="row"><span>HN / Wikipedia</span><b id="mix-val">50 / 50</b></div>
+            <input type="range" id="mix" min="0" max="100" step="5" value="50" oninput="onMix()">
+            <div class="mix-ends"><span>Wikipedia</span><span>Hacker News</span></div>
+          </div>
+          <div class="mix-note">Rebalances the two live demand sources: higher HN = tech / pain-point weighting; higher Wikipedia = general-interest weighting.</div>
         </div>
         <div class="ctrl-group">
           <label>Filter</label>
@@ -252,6 +263,7 @@
 <script>
 const LS_KEY = "underserved_market_tracker_v1";
 const LS_W = "underserved_market_weights_v1";
+const LS_MIX = "underserved_market_demandmix_v1";
 
 const SEED = [
   // Construction & Real Estate
@@ -272,6 +284,7 @@ let data = load();
 let weights = loadWeights();
 let sortKey = "opportunity", sortDir = -1;
 let liveMeta = null;
+let demandMix = loadMix(); // 0..1 = share given to Hacker News (rest to Wikipedia)
 
 // Fetch the auto-refreshed data.json (same origin) and overwrite the demand
 // score of any market whose name matches. Weakness & size stay manual. We do
@@ -286,10 +299,32 @@ async function applyLiveData(){
     let applied = 0;
     data.forEach(m => {
       const l = byName.get(m.name);
-      if (l && typeof l.demandScore === 'number') { m.demand = l.demandScore; m.demandLive = true; applied++; }
+      if (!l) return;
+      if (typeof l.demandScore === 'number') { m.demand = l.demandScore; m.demandLive = true; applied++; }
+      if (typeof l.hnScore === 'number') m.hnScore = l.hnScore;
+      if (typeof l.wikiScore === 'number') m.wikiScore = l.wikiScore;
+      if (typeof l.sizeScore === 'number') { m.size = l.sizeScore; m.sizeLive = true; }
+      if (typeof l.growthPct === 'number') m.growthPct = l.growthPct;
+      if (typeof l.establishments === 'number') m.establishments = l.establishments;
     });
-    if (applied) { liveMeta = { source: live.source, generatedAt: live.generatedAt, method: live.method }; render(); }
+    if (applied) { liveMeta = { source: live.source, generatedAt: live.generatedAt, method: live.method }; applyDemandMix(); render(); }
   } catch (e) { /* offline, file://, or no data.json yet — keep manual scores */ }
+}
+
+// Recompute demand for live markets from the current HN/Wikipedia mix.
+function applyDemandMix(){
+  data.forEach(m => {
+    if (m.demandLive && typeof m.hnScore === 'number' && typeof m.wikiScore === 'number') {
+      m.demand = Math.round((demandMix * m.hnScore + (1 - demandMix) * m.wikiScore) * 10) / 10;
+    }
+  });
+}
+function onMix(){
+  demandMix = parseInt(document.getElementById('mix').value, 10) / 100;
+  document.getElementById('mix-val').textContent = Math.round(demandMix*100) + ' / ' + Math.round((1-demandMix)*100);
+  saveMix();
+  applyDemandMix();
+  render();
 }
 
 function id(){ return Math.random().toString(36).slice(2,9); }
@@ -297,6 +332,8 @@ function load(){ try{ const r=localStorage.getItem(LS_KEY); if(r) return JSON.pa
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
 function loadWeights(){ try{ const r=localStorage.getItem(LS_W); if(r) return JSON.parse(r);}catch(e){} return {D:1,W:1,S:1}; }
 function saveWeights(){ localStorage.setItem(LS_W, JSON.stringify(weights)); }
+function loadMix(){ try{ const r=localStorage.getItem(LS_MIX); if(r!=null && r!=='') return Math.max(0,Math.min(1,parseFloat(r)));}catch(e){} return 0.5; }
+function saveMix(){ localStorage.setItem(LS_MIX, String(demandMix)); }
 
 function opportunity(m){
   const t = weights.D + weights.W + weights.S;
@@ -351,7 +388,7 @@ function renderLiveBanner(){
   const d = new Date(liveMeta.generatedAt);
   const when = isNaN(d) ? '' : ' · updated ' + d.toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'});
   el.style.display = 'flex';
-  el.innerHTML = `<span class="live-dot"></span> <b>Live demand data</b> — ${esc(liveMeta.source)}${when}. <span class="lb-note">Demand scores refresh automatically; incumbent weakness &amp; market size stay manual.</span>`;
+  el.innerHTML = `<span class="live-dot"></span> <b>Live data</b> — ${esc(liveMeta.source)}${when}. <span class="lb-note">Demand and market size refresh automatically; incumbent weakness stays manual (no reliable free source).</span>`;
 }
 
 function renderFilter(){
@@ -406,7 +443,7 @@ function renderTable(){
         <td><span class="tag">${esc(r.vertical)}</span></td>
         <td class="num mini">${r.demand}${r.demandLive?' <span class="live-dot" title="Live: blended Hacker News + Wikipedia signal"></span>':''}</td>
         <td class="num mini">${r.weakness}</td>
-        <td class="num mini">${r.size}</td>
+        <td class="num mini">${r.size}${r.sizeLive?` <span class="live-dot" title="Live (BLS QCEW): ${r.establishments?Number(r.establishments).toLocaleString()+' establishments':'establishments'}${typeof r.growthPct==='number'?', '+(r.growthPct>=0?'+':'')+r.growthPct+'%/yr':''}"></span>`:''}</td>
         <td class="num"><span class="score-pill" style="background:${heat(r.opportunity)}">${r.opportunity.toFixed(1)}</span></td>
         <td class="num"><button class="rowbtn" onclick="openModal('${r.id}')">Edit</button></td>
       </tr>`).join("")}
@@ -511,6 +548,8 @@ document.getElementById('wD').value=weights.D; document.getElementById('wW').val
 document.getElementById('wD-val').textContent=weights.D.toFixed(1);
 document.getElementById('wW-val').textContent=weights.W.toFixed(1);
 document.getElementById('wS-val').textContent=weights.S.toFixed(1);
+document.getElementById('mix').value = Math.round(demandMix*100);
+document.getElementById('mix-val').textContent = Math.round(demandMix*100)+' / '+Math.round((1-demandMix)*100);
 document.getElementById('modalBg').addEventListener('click', e=>{ if(e.target.id==='modalBg') closeModal(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 render();
