@@ -1,13 +1,14 @@
 {
-  "generatedAt": "2026-08-03T17:03:59.581Z",
+  "generatedAt": "2026-08-03T17:15:05.154Z",
   "region": "us",
   "source": "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)",
   "method": "Demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW 2024. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.",
+  "demandBasis": "blend",
   "markets": [
     {
       "name": "Small contractor job management",
-      "demandScore": 9.7,
-      "hnScore": 9.8,
+      "demandScore": 9.8,
+      "hnScore": 10,
       "wikiScore": 9.6,
       "sizeScore": 8.9,
       "establishments": 879970,
@@ -24,17 +25,17 @@
     },
     {
       "name": "Subcontractor scheduling & dispatch",
-      "demandScore": 6.6,
-      "hnScore": 5.6,
-      "wikiScore": 7.6,
+      "demandScore": 7,
+      "hnScore": 5.5,
+      "wikiScore": 8.4,
       "sizeScore": 8.8,
       "establishments": 588440,
       "growthPct": 1.4
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 6.9,
-      "hnScore": 5.2,
+      "demandScore": 7.4,
+      "hnScore": 6.2,
       "wikiScore": 8.6,
       "sizeScore": 6.3,
       "establishments": 8594,
@@ -43,7 +44,7 @@
     {
       "name": "Trades CRM & quoting",
       "demandScore": 9.5,
-      "hnScore": 10,
+      "hnScore": 9.9,
       "wikiScore": 9,
       "sizeScore": 8.8,
       "establishments": 588440,
