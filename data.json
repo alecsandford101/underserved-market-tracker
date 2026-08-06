@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T09:07:10.466Z",
+  "generatedAt": "2026-08-06T09:07:29.904Z",
   "region": "us",
   "source": "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)",
   "method": "Demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW 2024. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.",
@@ -7,8 +7,8 @@
   "markets": [
     {
       "name": "Small contractor job management",
-      "demandScore": 9.8,
-      "hnScore": 10,
+      "demandScore": 9.4,
+      "hnScore": 9.1,
       "wikiScore": 9.6,
       "sizeScore": 8.9,
       "establishments": 879970,
@@ -17,7 +17,7 @@
     {
       "name": "Independent landlord / property mgmt",
       "demandScore": 9.2,
-      "hnScore": 9.1,
+      "hnScore": 9.2,
       "wikiScore": 9.2,
       "sizeScore": 8.2,
       "establishments": 145687,
@@ -34,9 +34,9 @@
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 7.8,
-      "hnScore": 7.2,
-      "wikiScore": 8.5,
+      "demandScore": 7.4,
+      "hnScore": 6.2,
+      "wikiScore": 8.6,
       "sizeScore": 6.3,
       "establishments": 8594,
       "growthPct": -0.6
@@ -52,18 +52,18 @@
     },
     {
       "name": "Independent gym / studio ops",
-      "demandScore": 6.1,
+      "demandScore": 6,
       "hnScore": 2.3,
-      "wikiScore": 9.9,
+      "wikiScore": 9.8,
       "sizeScore": 7.5,
       "establishments": 44983,
       "growthPct": 1.9
     },
     {
       "name": "Auto repair shop management",
-      "demandScore": 5,
+      "demandScore": 4.2,
       "hnScore": 1,
-      "wikiScore": 9.1,
+      "wikiScore": 7.5,
       "sizeScore": 8,
       "establishments": 174480,
       "growthPct": 0.8
