@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06T09:07:57.463Z",
+  "generatedAt": "2026-08-07T07:43:30.509Z",
   "region": "uk",
   "source": "Google News UK (demand) · ONS UK Business Counts / Nomis (market size & growth)",
   "method": "Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.",
@@ -9,7 +9,7 @@
       "name": "Small contractor job management",
       "demandScore": 9.6,
       "hnScore": 10,
-      "wikiScore": 9.6,
+      "wikiScore": 9.5,
       "sizeScore": 8.5,
       "establishments": 128330,
       "growthPct": 0.6,
@@ -18,8 +18,8 @@
     {
       "name": "Independent landlord / property mgmt",
       "demandScore": 10,
-      "hnScore": 9.1,
-      "wikiScore": 9.2,
+      "hnScore": 9.2,
+      "wikiScore": 9.5,
       "sizeScore": 8.5,
       "establishments": 87285,
       "growthPct": 2.6,
@@ -27,23 +27,23 @@
     },
     {
       "name": "Subcontractor scheduling & dispatch",
-      "demandScore": 8.7,
+      "demandScore": 8.6,
       "hnScore": 5.4,
       "wikiScore": 8.4,
       "sizeScore": 9,
       "establishments": 243760,
       "growthPct": 1.8,
-      "newsScore": 8.7
+      "newsScore": 8.6
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 8.2,
+      "demandScore": 8,
       "hnScore": 7.2,
       "wikiScore": 8.6,
       "sizeScore": 7.8,
       "establishments": 21310,
       "growthPct": 3.8,
-      "newsScore": 8.2
+      "newsScore": 8
     },
     {
       "name": "Trades CRM & quoting",
@@ -59,7 +59,7 @@
       "name": "Independent gym / studio ops",
       "demandScore": 9.4,
       "hnScore": 2.3,
-      "wikiScore": 9.8,
+      "wikiScore": 9.9,
       "sizeScore": 7.6,
       "establishments": 14650,
       "growthPct": 3.2,
@@ -67,13 +67,13 @@
     },
     {
       "name": "Auto repair shop management",
-      "demandScore": 5.7,
+      "demandScore": 5.8,
       "hnScore": 1,
-      "wikiScore": 7.5,
+      "wikiScore": 9.1,
       "sizeScore": 8.2,
       "establishments": 54105,
       "growthPct": 2.4,
-      "newsScore": 5.7
+      "newsScore": 5.8
     },
     {
       "name": "Salon / barber booking & CRM",
