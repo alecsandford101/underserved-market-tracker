@@ -1,99 +1,99 @@
 {
-  "generatedAt": "2026-08-09T07:17:45.206Z",
+  "generatedAt": "2026-08-10T08:05:41.561Z",
   "region": "us",
   "source": "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)",
-  "method": "Demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW 2023. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.",
+  "method": "Demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW 2024. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.",
   "demandBasis": "blend",
   "markets": [
     {
       "name": "Small contractor job management",
-      "demandScore": 9.8,
-      "hnScore": 10,
+      "demandScore": 9.4,
+      "hnScore": 9.1,
       "wikiScore": 9.6,
-      "sizeScore": null,
-      "establishments": null,
-      "growthPct": null
+      "sizeScore": 8.9,
+      "establishments": 879970,
+      "growthPct": 1.2
     },
     {
       "name": "Independent landlord / property mgmt",
-      "demandScore": 9.3,
-      "hnScore": 9.1,
+      "demandScore": 9.4,
+      "hnScore": 9.2,
       "wikiScore": 9.5,
-      "sizeScore": null,
-      "establishments": null,
-      "growthPct": null
+      "sizeScore": 8.2,
+      "establishments": 145687,
+      "growthPct": 2.7
     },
     {
       "name": "Subcontractor scheduling & dispatch",
       "demandScore": 7,
-      "hnScore": 5.5,
+      "hnScore": 5.6,
       "wikiScore": 8.4,
-      "sizeScore": null,
-      "establishments": null,
-      "growthPct": null
+      "sizeScore": 8.8,
+      "establishments": 588440,
+      "growthPct": 1.4
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 7.9,
-      "hnScore": 7.2,
+      "demandScore": 7.4,
+      "hnScore": 6.2,
       "wikiScore": 8.6,
-      "sizeScore": null,
-      "establishments": null,
-      "growthPct": null
+      "sizeScore": 6.3,
+      "establishments": 8594,
+      "growthPct": -0.6
     },
     {
       "name": "Trades CRM & quoting",
       "demandScore": 9.5,
       "hnScore": 10,
       "wikiScore": 9,
-      "sizeScore": null,
-      "establishments": null,
-      "growthPct": null
+      "sizeScore": 8.8,
+      "establishments": 588440,
+      "growthPct": 1.4
     },
     {
       "name": "Independent gym / studio ops",
       "demandScore": 6.1,
       "hnScore": 2.3,
       "wikiScore": 9.9,
-      "sizeScore": null,
-      "establishments": null,
-      "growthPct": null
+      "sizeScore": 7.5,
+      "establishments": 44983,
+      "growthPct": 1.9
     },
     {
       "name": "Auto repair shop management",
       "demandScore": 5,
       "hnScore": 1,
       "wikiScore": 9.1,
-      "sizeScore": null,
-      "establishments": null,
-      "growthPct": null
+      "sizeScore": 8,
+      "establishments": 174480,
+      "growthPct": 0.8
     },
     {
       "name": "Salon / barber booking & CRM",
       "demandScore": 6.4,
       "hnScore": 2.9,
       "wikiScore": 9.9,
-      "sizeScore": null,
-      "establishments": null,
-      "growthPct": null
+      "sizeScore": 7.7,
+      "establishments": 86086,
+      "growthPct": 1
     },
     {
       "name": "Independent restaurant back-office",
       "demandScore": 8.1,
       "hnScore": 6.2,
       "wikiScore": 10,
-      "sizeScore": null,
-      "establishments": null,
-      "growthPct": null
+      "sizeScore": 8.8,
+      "establishments": 619919,
+      "growthPct": 1.5
     },
     {
       "name": "Small professional services (acct/law)",
       "demandScore": 8.7,
       "hnScore": 7.6,
       "wikiScore": 9.7,
-      "sizeScore": null,
-      "establishments": null,
-      "growthPct": null
+      "sizeScore": 8.6,
+      "establishments": 394921,
+      "growthPct": 1.9
     }
   ]
 }
