@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-10T08:06:08.104Z",
+  "generatedAt": "2026-08-11T07:39:03.686Z",
   "region": "uk",
   "source": "Google News UK (demand) · ONS UK Business Counts / Nomis (market size & growth)",
   "method": "Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.",
@@ -7,13 +7,13 @@
   "markets": [
     {
       "name": "Small contractor job management",
-      "demandScore": 9.6,
-      "hnScore": 9.1,
+      "demandScore": 9.5,
+      "hnScore": 9.5,
       "wikiScore": 9.6,
       "sizeScore": 8.5,
       "establishments": 128330,
       "growthPct": 0.6,
-      "newsScore": 9.6
+      "newsScore": 9.5
     },
     {
       "name": "Independent landlord / property mgmt",
@@ -28,7 +28,7 @@
     {
       "name": "Subcontractor scheduling & dispatch",
       "demandScore": 8.7,
-      "hnScore": 5.4,
+      "hnScore": 5.6,
       "wikiScore": 8.4,
       "sizeScore": 9,
       "establishments": 243760,
@@ -38,7 +38,7 @@
     {
       "name": "Building inspection & surveying",
       "demandScore": 7.8,
-      "hnScore": 7.3,
+      "hnScore": 7,
       "wikiScore": 8.6,
       "sizeScore": 7.8,
       "establishments": 21310,
@@ -47,23 +47,23 @@
     },
     {
       "name": "Trades CRM & quoting",
-      "demandScore": 9.6,
+      "demandScore": 9.5,
       "hnScore": 10,
       "wikiScore": 9,
       "sizeScore": 9,
       "establishments": 243760,
       "growthPct": 1.8,
-      "newsScore": 9.6
+      "newsScore": 9.5
     },
     {
       "name": "Independent gym / studio ops",
-      "demandScore": 9.5,
+      "demandScore": 9.4,
       "hnScore": 2.3,
       "wikiScore": 9.9,
       "sizeScore": 7.6,
       "establishments": 14650,
       "growthPct": 3.2,
-      "newsScore": 9.5
+      "newsScore": 9.4
     },
     {
       "name": "Auto repair shop management",
