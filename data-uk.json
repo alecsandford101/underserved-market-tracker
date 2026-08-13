@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-12T07:54:45.014Z",
+  "generatedAt": "2026-08-13T07:54:55.985Z",
   "region": "uk",
   "source": "Google News UK (demand) · ONS UK Business Counts / Nomis (market size & growth)",
   "method": "Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.",
@@ -9,7 +9,7 @@
       "name": "Small contractor job management",
       "demandScore": 9.6,
       "hnScore": 9.1,
-      "wikiScore": 9.5,
+      "wikiScore": 9.6,
       "sizeScore": 8.5,
       "establishments": 128330,
       "growthPct": 0.6,
@@ -37,13 +37,13 @@
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 7.9,
-      "hnScore": 7.5,
+      "demandScore": 7.7,
+      "hnScore": 5.9,
       "wikiScore": 8.6,
       "sizeScore": 7.8,
       "establishments": 21310,
       "growthPct": 3.8,
-      "newsScore": 7.9
+      "newsScore": 7.7
     },
     {
       "name": "Trades CRM & quoting",
@@ -59,7 +59,7 @@
       "name": "Independent gym / studio ops",
       "demandScore": 9.4,
       "hnScore": 2.3,
-      "wikiScore": 9.8,
+      "wikiScore": 9.9,
       "sizeScore": 7.6,
       "establishments": 14650,
       "growthPct": 3.2,
