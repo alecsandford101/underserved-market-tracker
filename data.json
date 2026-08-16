@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15T06:58:40.225Z",
+  "generatedAt": "2026-08-16T07:00:22.352Z",
   "region": "us",
   "source": "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)",
   "method": "Demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW 2024. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.",
@@ -25,17 +25,17 @@
     },
     {
       "name": "Subcontractor scheduling & dispatch",
-      "demandScore": 6.8,
-      "hnScore": 5.6,
-      "wikiScore": 8.1,
+      "demandScore": 6.9,
+      "hnScore": 5.4,
+      "wikiScore": 8.4,
       "sizeScore": 8.8,
       "establishments": 588440,
       "growthPct": 1.4
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 7.2,
-      "hnScore": 5.9,
+      "demandScore": 7.6,
+      "hnScore": 6.7,
       "wikiScore": 8.6,
       "sizeScore": 6.3,
       "establishments": 8594,
@@ -45,7 +45,7 @@
       "name": "Trades CRM & quoting",
       "demandScore": 9.5,
       "hnScore": 10,
-      "wikiScore": 8.9,
+      "wikiScore": 9,
       "sizeScore": 8.8,
       "establishments": 588440,
       "growthPct": 1.4
@@ -80,7 +80,7 @@
     {
       "name": "Independent restaurant back-office",
       "demandScore": 8.1,
-      "hnScore": 6.2,
+      "hnScore": 6.1,
       "wikiScore": 10,
       "sizeScore": 8.8,
       "establishments": 619919,
