@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-16T07:00:50.141Z",
+  "generatedAt": "2026-08-17T07:17:56.766Z",
   "region": "uk",
   "source": "Google News UK (demand) · ONS UK Business Counts / Nomis (market size & growth)",
   "method": "Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.",
@@ -8,7 +8,7 @@
     {
       "name": "Small contractor job management",
       "demandScore": 9.5,
-      "hnScore": 9.8,
+      "hnScore": 9.5,
       "wikiScore": 9.6,
       "sizeScore": 8.5,
       "establishments": 128330,
@@ -38,7 +38,7 @@
     {
       "name": "Building inspection & surveying",
       "demandScore": 7.9,
-      "hnScore": 5.9,
+      "hnScore": 6.8,
       "wikiScore": 8.6,
       "sizeScore": 7.8,
       "establishments": 21310,
@@ -67,13 +67,13 @@
     },
     {
       "name": "Auto repair shop management",
-      "demandScore": 5.5,
+      "demandScore": 5.8,
       "hnScore": 1,
       "wikiScore": 9.1,
       "sizeScore": 8.2,
       "establishments": 54105,
       "growthPct": 2.4,
-      "newsScore": 5.5
+      "newsScore": 5.8
     },
     {
       "name": "Salon / barber booking & CRM",
