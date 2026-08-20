@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-19T07:07:14.961Z",
+  "generatedAt": "2026-08-20T07:08:10.157Z",
   "region": "uk",
   "source": "Google News UK (demand) · ONS UK Business Counts / Nomis (market size & growth)",
   "method": "Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.",
@@ -7,13 +7,13 @@
   "markets": [
     {
       "name": "Small contractor job management",
-      "demandScore": 9.5,
-      "hnScore": 9.5,
+      "demandScore": 9.6,
+      "hnScore": 9.9,
       "wikiScore": 9.6,
       "sizeScore": 8.5,
       "establishments": 128330,
       "growthPct": 0.6,
-      "newsScore": 9.5
+      "newsScore": 9.6
     },
     {
       "name": "Independent landlord / property mgmt",
@@ -27,23 +27,23 @@
     },
     {
       "name": "Subcontractor scheduling & dispatch",
-      "demandScore": 8.2,
-      "hnScore": 5.4,
+      "demandScore": 8.3,
+      "hnScore": 5.6,
       "wikiScore": 8.4,
       "sizeScore": 9,
       "establishments": 243760,
       "growthPct": 1.8,
-      "newsScore": 8.2
+      "newsScore": 8.3
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 8,
-      "hnScore": 6.5,
+      "demandScore": 7.9,
+      "hnScore": 7.8,
       "wikiScore": 8.6,
       "sizeScore": 7.8,
       "establishments": 21310,
       "growthPct": 3.8,
-      "newsScore": 8
+      "newsScore": 7.9
     },
     {
       "name": "Trades CRM & quoting",
@@ -57,13 +57,13 @@
     },
     {
       "name": "Independent gym / studio ops",
-      "demandScore": 9.4,
+      "demandScore": 9.3,
       "hnScore": 2.3,
       "wikiScore": 9.9,
       "sizeScore": 7.6,
       "establishments": 14650,
       "growthPct": 3.2,
-      "newsScore": 9.4
+      "newsScore": 9.3
     },
     {
       "name": "Auto repair shop management",
