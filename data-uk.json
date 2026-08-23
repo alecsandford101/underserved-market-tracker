@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-22T07:01:05.445Z",
+  "generatedAt": "2026-08-23T07:02:30.337Z",
   "region": "uk",
   "source": "Google News UK (demand) · ONS UK Business Counts / Nomis (market size & growth)",
   "method": "Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.",
@@ -37,13 +37,13 @@
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 8,
-      "hnScore": 7.7,
+      "demandScore": 8.1,
+      "hnScore": 7.8,
       "wikiScore": 8.6,
       "sizeScore": 7.8,
       "establishments": 21310,
       "growthPct": 3.8,
-      "newsScore": 8
+      "newsScore": 8.1
     },
     {
       "name": "Trades CRM & quoting",
@@ -57,23 +57,23 @@
     },
     {
       "name": "Independent gym / studio ops",
-      "demandScore": 9.3,
-      "hnScore": 4.4,
+      "demandScore": 9.1,
+      "hnScore": 4.8,
       "wikiScore": 9.9,
       "sizeScore": 7.6,
       "establishments": 14650,
       "growthPct": 3.2,
-      "newsScore": 9.3
+      "newsScore": 9.1
     },
     {
       "name": "Auto repair shop management",
-      "demandScore": 6.1,
+      "demandScore": 6,
       "hnScore": 1,
       "wikiScore": 9.1,
       "sizeScore": 8.2,
       "establishments": 54105,
       "growthPct": 2.4,
-      "newsScore": 6.1
+      "newsScore": 6
     },
     {
       "name": "Salon / barber booking & CRM",
