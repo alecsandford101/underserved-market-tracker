@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T07:30:12.481Z",
+  "generatedAt": "2026-08-25T07:10:07.073Z",
   "region": "uk",
   "source": "Google News UK (demand) · ONS UK Business Counts / Nomis (market size & growth)",
   "method": "Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.",
@@ -8,7 +8,7 @@
     {
       "name": "Small contractor job management",
       "demandScore": 9.7,
-      "hnScore": 9.8,
+      "hnScore": 9.5,
       "wikiScore": 9.6,
       "sizeScore": 8.5,
       "establishments": 128330,
@@ -37,33 +37,33 @@
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 8.1,
-      "hnScore": 7.8,
+      "demandScore": 8,
+      "hnScore": 7.6,
       "wikiScore": 8.6,
       "sizeScore": 7.8,
       "establishments": 21310,
       "growthPct": 3.8,
-      "newsScore": 8.1
+      "newsScore": 8
     },
     {
       "name": "Trades CRM & quoting",
-      "demandScore": 9.5,
+      "demandScore": 9.4,
       "hnScore": 10,
       "wikiScore": 9,
       "sizeScore": 9,
       "establishments": 243760,
       "growthPct": 1.8,
-      "newsScore": 9.5
+      "newsScore": 9.4
     },
     {
       "name": "Independent gym / studio ops",
-      "demandScore": 9.1,
-      "hnScore": 4.8,
+      "demandScore": 9.2,
+      "hnScore": 4.9,
       "wikiScore": 9.9,
       "sizeScore": 7.6,
       "establishments": 14650,
       "growthPct": 3.2,
-      "newsScore": 9.1
+      "newsScore": 9.2
     },
     {
       "name": "Auto repair shop management",
