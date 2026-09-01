@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T13:55:01.105Z",
+  "generatedAt": "2026-09-01T11:41:57.102Z",
   "region": "uk",
   "source": "Google News UK (demand) · ONS UK Business Counts / Nomis (market size & growth)",
   "method": "Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.",
@@ -7,13 +7,13 @@
   "markets": [
     {
       "name": "Small contractor job management",
-      "demandScore": 9.6,
-      "hnScore": 9.6,
+      "demandScore": 9.5,
+      "hnScore": 9.1,
       "wikiScore": 9.6,
       "sizeScore": 8.5,
       "establishments": 128330,
       "growthPct": 0.6,
-      "newsScore": 9.6
+      "newsScore": 9.5
     },
     {
       "name": "Independent landlord / property mgmt",
@@ -27,19 +27,19 @@
     },
     {
       "name": "Subcontractor scheduling & dispatch",
-      "demandScore": 8.7,
-      "hnScore": 5.4,
+      "demandScore": 8.6,
+      "hnScore": 5.6,
       "wikiScore": 8.4,
       "sizeScore": 9,
       "establishments": 243760,
       "growthPct": 1.8,
-      "newsScore": 8.7
+      "newsScore": 8.6
     },
     {
       "name": "Building inspection & surveying",
       "demandScore": 8.3,
-      "hnScore": 6.6,
-      "wikiScore": 8.6,
+      "hnScore": 7.6,
+      "wikiScore": 8.7,
       "sizeScore": 7.8,
       "establishments": 21310,
       "growthPct": 3.8,
