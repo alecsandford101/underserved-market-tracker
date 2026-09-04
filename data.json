@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T11:17:14.969Z",
+  "generatedAt": "2026-09-04T11:20:15.335Z",
   "region": "us",
   "source": "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)",
   "method": "Demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW 2024. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.",
@@ -7,8 +7,8 @@
   "markets": [
     {
       "name": "Small contractor job management",
-      "demandScore": 9.6,
-      "hnScore": 9.6,
+      "demandScore": 9.4,
+      "hnScore": 9.1,
       "wikiScore": 9.7,
       "sizeScore": 8.9,
       "establishments": 879970,
@@ -52,8 +52,8 @@
     },
     {
       "name": "Independent gym / studio ops",
-      "demandScore": 7.4,
-      "hnScore": 5,
+      "demandScore": 7.6,
+      "hnScore": 5.2,
       "wikiScore": 9.9,
       "sizeScore": 7.5,
       "establishments": 44983,
