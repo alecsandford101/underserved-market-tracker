@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-06T10:59:52.304Z",
+  "generatedAt": "2026-09-07T12:36:17.476Z",
   "region": "us",
   "source": "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)",
   "method": "Demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW 2024. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.",
@@ -7,8 +7,8 @@
   "markets": [
     {
       "name": "Small contractor job management",
-      "demandScore": 9.8,
-      "hnScore": 10,
+      "demandScore": 9.4,
+      "hnScore": 9.1,
       "wikiScore": 9.7,
       "sizeScore": 8.9,
       "establishments": 879970,
@@ -71,7 +71,7 @@
     {
       "name": "Salon / barber booking & CRM",
       "demandScore": 6.4,
-      "hnScore": 2.9,
+      "hnScore": 3,
       "wikiScore": 9.9,
       "sizeScore": 7.7,
       "establishments": 86086,
@@ -89,7 +89,7 @@
     {
       "name": "Small professional services (acct/law)",
       "demandScore": 8.7,
-      "hnScore": 7.6,
+      "hnScore": 7.7,
       "wikiScore": 9.7,
       "sizeScore": 8.6,
       "establishments": 394921,
