@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T11:40:34.222Z",
+  "generatedAt": "2026-09-24T11:49:11.542Z",
   "region": "uk",
   "source": "Google News UK (demand) · ONS UK Business Counts / Nomis (market size & growth)",
   "method": "Demand = UK online news interest (Google News, gl=GB) item counts, log-normalised to 1-10 — a UK-weighted media-coverage proxy, not search volume (verticals with no news fall back to the global HN+Wikipedia blend). Size & growth = 80% local-unit counts + 20% YoY growth, ONS UK Business Counts via Nomis (SIC 2007), log-normalised to 1-10.",
@@ -8,7 +8,7 @@
     {
       "name": "Small contractor job management",
       "demandScore": 9.5,
-      "hnScore": 9.9,
+      "hnScore": 8.8,
       "wikiScore": 9.7,
       "sizeScore": 8.5,
       "establishments": 128330,
