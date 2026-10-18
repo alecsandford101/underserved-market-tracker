@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T10:47:21.108Z",
+  "generatedAt": "2026-10-18T11:08:40.858Z",
   "region": "us",
   "source": "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)",
   "method": "Demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW 2024. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.",
@@ -26,7 +26,7 @@
     {
       "name": "Subcontractor scheduling & dispatch",
       "demandScore": 6.8,
-      "hnScore": 5.1,
+      "hnScore": 5.2,
       "wikiScore": 8.4,
       "sizeScore": 8.8,
       "establishments": 588440,
@@ -34,8 +34,8 @@
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 7.7,
-      "hnScore": 6.6,
+      "demandScore": 8.4,
+      "hnScore": 8.1,
       "wikiScore": 8.7,
       "sizeScore": 6.3,
       "establishments": 8594,
@@ -53,7 +53,7 @@
     {
       "name": "Independent gym / studio ops",
       "demandScore": 7.4,
-      "hnScore": 5,
+      "hnScore": 4.8,
       "wikiScore": 9.9,
       "sizeScore": 7.5,
       "establishments": 44983,
