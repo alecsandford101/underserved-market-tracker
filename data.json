@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-19T15:46:50.278Z",
+  "generatedAt": "2026-11-20T15:29:16.614Z",
   "region": "us",
   "source": "Hacker News + Wikipedia (demand) · BLS QCEW (market size & growth)",
   "method": "Demand = 50% HN discussion (3y) + 50% Wikipedia pageviews (12mo). Size & growth = 80% establishment counts + 20% YoY establishment growth, BLS QCEW 2024. All log-normalised to 1-10. hnScore/wikiScore exposed so the dashboard can re-mix demand.",
@@ -34,8 +34,8 @@
     },
     {
       "name": "Building inspection & surveying",
-      "demandScore": 8.3,
-      "hnScore": 8.1,
+      "demandScore": 7.6,
+      "hnScore": 6.6,
       "wikiScore": 8.6,
       "sizeScore": 6.3,
       "establishments": 8594,
